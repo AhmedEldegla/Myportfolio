@@ -94,14 +94,27 @@ strong{ color: color-mix(in srgb, var(--accent) 70%, var(--text)); }
   display:flex; align-items:center; gap:12px;
   text-decoration:none; font-weight:900;
 }
+
 .brand__mark{
-  width:42px; height:42px;
-  display:grid; place-items:center;
+  width:42px;
+  height:42px;
+  display:flex;             
+  align-items:center;
+  justify-content:center;
+  gap:1px;                 
   border-radius:14px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color:#07101c;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: -1px;
 }
-.brand__text{ letter-spacing:.2px; }
+.brand__mark .logo-a{
+  color:#fff;
+}
+
+.brand__mark .logo-e{
+  color: var(--accent);
+}
 
 .nav__links{
   display:flex; gap:6px; align-items:center;
