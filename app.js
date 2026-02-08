@@ -1,0 +1,336 @@
+(() => {
+  const PROFILE = {
+    email: "ahmeddagla99@gmail.com",
+    roleTyping: [
+      ".NET Backend Developer",
+      "ASP.NET Core • Clean Architecture",
+      "SQL Server • Docker • Git"
+    ],
+    skills: [
+      { icon: "fa-brands fa-microsoft", name: ".NET", hint: "ASP.NET Core" },
+      { icon: "fa-solid fa-database", name: "SQL Server", hint: "T-SQL" },
+      { icon: "fa-brands fa-docker", name: "Docker", hint: "Containers" },
+      { icon: "fa-brands fa-git-alt", name: "Git", hint: "Version control" },
+      { icon: "fa-brands fa-github", name: "GitHub", hint: "Repos" },
+      { icon: "fa-brands fa-gitlab", name: "GitLab", hint: "CI/CD" }
+    ],
+    projects: [
+      {
+        title: "Depi FreeLance Platform",
+        desc: "Freelance platform concept with clean UI and modern flow.",
+        tags: ["Platform", "Web"],
+        category: "platform",
+        live: "https://depi-connect-pros.lovable.app/",
+        github: ""
+      },
+      {
+        title: "Smart Accountant",
+        desc: "Dashboard-like experience for accounting workflows and business views.",
+        tags: ["Dashboard", "Web"],
+        category: "dashboard",
+        live: "https://smart-cloud-biz.lovable.app/dashboard",
+        github: ""
+      }
+    ]
+  };
+
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+
+  // Toast
+  function toast(msg) {
+    const t = $("#toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => (t.style.display = "none"), 2100);
+  }
+
+  // Theme
+  const THEME_KEY = "ae_theme";
+  function getPreferredTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "dark" || saved === "light") return saved;
+    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(THEME_KEY, theme);
+
+    const isLight = theme === "light";
+    const iconClass = isLight ? "fa-sun" : "fa-moon";
+    const label = isLight ? "Light" : "Dark";
+
+    const icon = $("#themeIcon");
+    const text = $("#themeText");
+    const iconM = $("#themeIconMobile");
+    const textM = $("#themeTextMobile");
+
+    if (icon) icon.className = `fa-solid ${iconClass}`;
+    if (text) text.textContent = label;
+    if (iconM) iconM.className = `fa-solid ${iconClass}`;
+    if (textM) textM.textContent = label;
+
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", isLight ? "#f7f8fb" : "#0b1220");
+  }
+  function initTheme() {
+    setTheme(getPreferredTheme());
+    $("#themeToggle")?.addEventListener("click", () => {
+      const curr = document.documentElement.getAttribute("data-theme") || "dark";
+      setTheme(curr === "dark" ? "light" : "dark");
+    });
+    $("#themeToggleMobile")?.addEventListener("click", () => {
+      const curr = document.documentElement.getAttribute("data-theme") || "dark";
+      setTheme(curr === "dark" ? "light" : "dark");
+    });
+  }
+
+  // Mobile menu
+  function initMobileMenu() {
+    const burger = $("#burger");
+    const menu = $("#mobileMenu");
+    if (!burger || !menu) return;
+
+    const close = () => {
+      menu.classList.remove("open");
+      burger.setAttribute("aria-expanded", "false");
+      menu.setAttribute("aria-hidden", "true");
+    };
+
+    burger.addEventListener("click", () => {
+      const open = menu.classList.toggle("open");
+      burger.setAttribute("aria-expanded", String(open));
+      menu.setAttribute("aria-hidden", String(!open));
+    });
+
+    $$(".mobile__link").forEach((a) => a.addEventListener("click", close));
+    window.addEventListener("keydown", (e) => e.key === "Escape" && close());
+  }
+
+  // Active nav
+  function initActiveNav() {
+    const links = $$(".nav__link");
+    const ids = ["home", "skills", "experience", "projects", "contact"];
+    const sections = ids.map((id) => document.getElementById(id)).filter(Boolean);
+
+    const byHash = (hash) => links.find((a) => a.getAttribute("href") === hash);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((x) => x.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+
+        links.forEach((a) => a.classList.remove("active"));
+        const l = byHash("#" + visible.target.id);
+        if (l) l.classList.add("active");
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: [0.08, 0.2, 0.45] }
+    );
+
+    sections.forEach((s) => io.observe(s));
+  }
+
+  // Reveal
+  function initReveal() {
+    const els = $$(".reveal");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      els.forEach((el) => el.classList.add("show"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("show")),
+      { threshold: 0.12 }
+    );
+    els.forEach((el) => io.observe(el));
+  }
+
+  // Typing
+  function typeLoop(targetEl, words, speed = 44, pause = 900) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { targetEl.textContent = words[0]; return; }
+
+    let w = 0, i = 0, del = false;
+    const tick = () => {
+      const word = words[w % words.length];
+      if (!del) {
+        i++;
+        targetEl.textContent = word.slice(0, i);
+        if (i >= word.length) { del = true; setTimeout(tick, pause); return; }
+      } else {
+        i--;
+        targetEl.textContent = word.slice(0, i);
+        if (i <= 0) { del = false; w++; }
+      }
+      setTimeout(tick, del ? speed * 0.65 : speed);
+    };
+    tick();
+  }
+
+  // Copy email + mailto form
+  function initContact() {
+    $("#year").textContent = new Date().getFullYear();
+
+    $("#copyEmailBtn")?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(PROFILE.email);
+        toast("Email copied ✅");
+      } catch {
+        toast("Copy failed ❗");
+      }
+    });
+
+    $("#contactForm")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = $("#name").value.trim();
+      const email = $("#email").value.trim();
+      const message = $("#message").value.trim();
+      const subject = encodeURIComponent(`Portfolio Contact - ${name || "New Message"}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n`);
+      window.location.href = `mailto:${PROFILE.email}?subject=${subject}&body=${body}`;
+    });
+  }
+
+  // Render skills
+  function renderSkills() {
+    const grid = $("#skillsGrid");
+    if (!grid) return;
+
+    grid.innerHTML = PROFILE.skills.map((s) => `
+      <article class="card skill">
+        <div class="skill__icon"><i class="${s.icon}"></i></div>
+        <div class="skill__name">${s.name}</div>
+        <div class="skill__hint">${s.hint}</div>
+      </article>
+    `).join("");
+  }
+
+  // Render projects
+  function renderProjects() {
+    const grid = $("#projectsGrid");
+    if (!grid) return;
+
+    grid.innerHTML = PROFILE.projects.map((p) => {
+      const tags = (p.tags || []).map((t) => `<span class="tag">${t}</span>`).join("");
+      const liveBtn = p.live ? `
+        <a class="btn btn--primary btn--sm" href="${p.live}" target="_blank" rel="noreferrer">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Live
+        </a>` : "";
+
+      const ghBtn = p.github ? `
+        <a class="btn btn--ghost btn--sm" href="${p.github}" target="_blank" rel="noreferrer">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>` : `
+        <button class="btn btn--ghost btn--sm" type="button" data-ghost="true">
+          <i class="fa-regular fa-folder-open"></i> Repo (soon)
+        </button>`;
+
+      return `
+        <article class="card project" data-category="${p.category}">
+          <div class="project__row">
+            <div>
+              <h3 class="project__title">${p.title}</h3>
+              <p class="project__desc">${p.desc}</p>
+            </div>
+            <div class="tags">${tags}</div>
+          </div>
+          <div class="project__links">
+            ${liveBtn}
+            ${ghBtn}
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    $$('button[data-ghost="true"]', grid).forEach((b) => {
+      b.addEventListener("click", () => toast("Add GitHub repo link for this project ✅"));
+    });
+  }
+
+  // Filter
+  function initProjectFilter() {
+    const btns = $$(".filter");
+    const cards = () => $$(".project");
+
+    const apply = (filter) => {
+      cards().forEach((c) => {
+        const cat = c.getAttribute("data-category");
+        c.style.display = (filter === "all" || cat === filter) ? "" : "none";
+      });
+    };
+
+    btns.forEach((b) => {
+      b.addEventListener("click", () => {
+        btns.forEach((x) => x.classList.remove("active"));
+        b.classList.add("active");
+        apply(b.dataset.filter);
+      });
+    });
+
+    apply("all");
+  }
+
+  // Smooth anchors (stable on mobile)
+  function initSmoothAnchors() {
+    $$('a[href^="#"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const href = a.getAttribute("href");
+        if (!href || href === "#") return;
+        const el = document.querySelector(href);
+        if (!el) return;
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", href);
+      });
+    });
+  }
+
+  // Subtle 3D tilt on photo card
+  function initPhotoTilt() {
+    const card = $("#profileCard");
+    if (!card) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    let raf = 0;
+    const onMove = (e) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (0.5 - y) * 6;
+        const ry = (x - 0.5) * 7;
+        card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      });
+    };
+    const onLeave = () => (card.style.transform = "");
+
+    card.addEventListener("mousemove", onMove);
+    card.addEventListener("mouseleave", onLeave);
+    card.addEventListener("touchstart", onLeave, { passive: true });
+  }
+
+  function boot() {
+    initTheme();
+    initMobileMenu();
+    initActiveNav();
+    initReveal();
+    initContact();
+    initSmoothAnchors();
+
+    const typeTarget = $("#typeTarget");
+    if (typeTarget) typeLoop(typeTarget, PROFILE.roleTyping);
+
+    renderSkills();
+    renderProjects();
+    initProjectFilter();
+    initPhotoTilt();
+  }
+
+  document.addEventListener("DOMContentLoaded", boot);
+})();

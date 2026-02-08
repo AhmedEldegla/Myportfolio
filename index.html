@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="robots" content="index,follow" />
+  <meta name="description" content="Ahmed Eldegla — .NET Backend Developer. Clean, scalable APIs with performance-focused SQL and modern tooling (Docker, Git)." />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="canonical" href="https://ahmedeldegla.github.io/portfolio/" />
+
+  <title>Ahmed Eldegla | .NET Backend Developer</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ahmed Eldegla | .NET Backend Developer" />
+  <meta property="og:description" content="Clean, scalable APIs with performance-focused SQL and modern tooling (Docker, Git)." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ahmedeldegla.github.io/portfolio/" />
+  <meta property="og:image" content="assets/profile.jpg" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ahmed Eldegla | .NET Backend Developer" />
+  <meta name="twitter:description" content="Clean, scalable APIs with performance-focused SQL and modern tooling (Docker, Git)." />
+  <meta name="twitter:image" content="assets/profile.jpg" />
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Person",
+    "name":"Ahmed Eldegla",
+    "jobTitle":".NET Backend Developer",
+    "url":"https://ahmedeldegla.github.io/portfolio/",
+    "image":"https://ahmedeldegla.github.io/portfolio/assets/profile.jpg",
+    "sameAs":[
+      "https://www.linkedin.com/in/ahmed-eldegla-2a751b184/",
+      "https://github.com/AhmedEldegla"
+    ]
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./app.js" defer></script>
+</head>
+
+<body>
+  <!-- Background -->
+  <div class="bg" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="grid"></div>
+  </div>
+
+  <header class="nav">
+    <div class="container nav__inner">
+      <a class="brand" href="#home" aria-label="Go to home">
+        <span class="brand__mark" aria-hidden="true">AE</span>
+        <span class="brand__text">Ahmed <span class="accent">Eldegla</span></span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a class="nav__link active" href="#home">Home</a>
+        <a class="nav__link" href="#skills">Skills</a>
+        <a class="nav__link" href="#experience">Experience</a>
+        <a class="nav__link" href="#projects">Projects</a>
+        <a class="nav__link" href="#contact">Contact</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--ghost btn--sm" href="./assets/CV.pdf" target="_blank" rel="noreferrer">
+          <i class="fa-regular fa-file-pdf"></i> CV
+        </a>
+
+        <button class="toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
+          <span class="toggle__text" id="themeText">Dark</span>
+        </button>
+
+        <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="mobile" id="mobileMenu" aria-hidden="true">
+      <a href="#home" class="mobile__link">Home</a>
+      <a href="#skills" class="mobile__link">Skills</a>
+      <a href="#experience" class="mobile__link">Experience</a>
+      <a href="#projects" class="mobile__link">Projects</a>
+      <a href="#contact" class="mobile__link">Contact</a>
+
+      <div class="mobile__actions">
+        <a class="btn btn--ghost" href="./assets/CV.pdf" target="_blank" rel="noreferrer">
+          <i class="fa-regular fa-file-pdf"></i> Download CV
+        </a>
+
+        <button class="toggle" id="themeToggleMobile" type="button" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon" id="themeIconMobile" aria-hidden="true"></i>
+          <span class="toggle__text" id="themeTextMobile">Dark</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="hero__copy">
+        <div class="pill reveal">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Available for opportunities</span>
+        </div>
+
+        <h1 class="title reveal">Ahmed Eldegla</h1>
+        <p class="role reveal">
+          <span id="typeTarget"></span><span class="caret" aria-hidden="true"></span>
+        </p>
+
+        <p class="lead reveal">
+          I build clean, scalable <strong>.NET</strong> backend APIs with performance-focused <strong>SQL Server</strong>,
+          and modern tooling like <strong>Docker</strong> and <strong>Git</strong>.
+        </p>
+
+        <div class="cta reveal">
+          <a class="btn btn--primary" href="#projects"><i class="fa-solid fa-layer-group"></i> Projects</a>
+          <a class="btn btn--ghost" href="#contact"><i class="fa-regular fa-paper-plane"></i> Contact</a>
+          <button class="btn btn--ghost" id="copyEmailBtn" type="button"><i class="fa-regular fa-copy"></i> Copy Email</button>
+        </div>
+
+        <div class="links reveal">
+          <a class="link" href="https://www.linkedin.com/in/ahmed-eldegla-2a751b184/" target="_blank" rel="noreferrer">
+            <i class="fa-brands fa-linkedin"></i> LinkedIn
+          </a>
+          <a class="link" href="https://github.com/AhmedEldegla" target="_blank" rel="noreferrer">
+            <i class="fa-brands fa-github"></i> GitHub
+          </a>
+        </div>
+
+        <div class="quick reveal" aria-label="Quick highlights">
+          <div class="quick__item">
+            <div class="quick__kpi">5+</div>
+            <div class="quick__txt">Years Freelancing</div>
+          </div>
+          <div class="quick__item">
+            <div class="quick__kpi">APIs</div>
+            <div class="quick__txt">ASP.NET Core</div>
+          </div>
+          <div class="quick__item">
+            <div class="quick__kpi">SQL</div>
+            <div class="quick__txt">Performance mindset</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero__side">
+        <!-- Shorter photo area -->
+        <div class="photoCard reveal" id="profileCard">
+          <div class="photoCard__shine" aria-hidden="true"></div>
+          <img
+            class="photoCard__img"
+            src="./assets/profile.jpg"
+            alt="Ahmed Eldegla photo"
+            width="900"
+            height="900"
+            loading="eager"
+          />
+          <div class="photoCard__meta">
+            <div class="photoCard__name">Ahmed Eldegla</div>
+            <div class="photoCard__tag">.NET Backend Developer</div>
+          </div>
+        </div>
+
+        <div class="miniCard reveal">
+          <div class="miniCard__row">
+            <span class="badge"><i class="fa-solid fa-shield-halved"></i> Reliable</span>
+            <span class="badge"><i class="fa-solid fa-gauge-high"></i> Performant</span>
+            <span class="badge"><i class="fa-solid fa-sitemap"></i> Maintainable</span>
+          </div>
+          <p class="miniCard__text">Clean backend delivery, clear structure, and production-ready practices.</p>
+        </div>
+      </aside>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+      <header class="section__head reveal">
+        <h2 class="section__title">Skills</h2>
+        <p class="section__sub">Focused, not noisy — the stack I actually use.</p>
+      </header>
+
+      <div class="skills reveal" id="skillsGrid"></div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="section">
+      <header class="section__head reveal">
+        <h2 class="section__title">Experience</h2>
+        <p class="section__sub">Short and recruiter-friendly.</p>
+      </header>
+
+      <div class="xp reveal">
+        <article class="card xp__item">
+          <div class="xp__top">
+            <div>
+              <h3 class="xp__title">Freelancer — Backend Developer (.NET)</h3>
+              <div class="xp__meta">5 years • Remote</div>
+            </div>
+            <span class="pill2">2019 — Present</span>
+          </div>
+          <ul class="xp__list">
+            <li>Built REST APIs with ASP.NET Core.</li>
+            <li>Worked with SQL Server (queries, procedures, performance basics).</li>
+            <li>Delivered maintainable, clean architecture-friendly code.</li>
+          </ul>
+        </article>
+
+        <article class="card xp__item">
+          <div class="xp__top">
+            <div>
+              <h3 class="xp__title">DEPI — Digital Egypt Pioneers Initiative</h3>
+              <div class="xp__meta">منحة رواد مصر الرقميين • وزارة الاتصالات (MCIT)</div>
+            </div>
+            <span class="pill2">Training</span>
+          </div>
+          <p class="xp__p">Focused on practical projects, real-world workflows, and industry-ready skills.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+      <header class="section__head reveal">
+        <h2 class="section__title">Projects</h2>
+        <p class="section__sub">A couple of selected work items.</p>
+      </header>
+
+      <div class="filters reveal" role="tablist" aria-label="Project filters">
+        <button class="filter active" data-filter="all" type="button">All</button>
+        <button class="filter" data-filter="platform" type="button">Platform</button>
+        <button class="filter" data-filter="dashboard" type="button">Dashboard</button>
+      </div>
+
+      <div class="projects reveal" id="projectsGrid" aria-live="polite"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <header class="section__head reveal">
+        <h2 class="section__title">Contact</h2>
+        <p class="section__sub">Fastest way: email.</p>
+      </header>
+
+      <div class="contact reveal">
+        <div class="card contact__left">
+          <a class="contactRow" href="mailto:ahmeddagla99@gmail.com">
+            <span class="contactRow__icon"><i class="fa-regular fa-envelope"></i></span>
+            <span>
+              <span class="contactRow__title">Email</span>
+              <span class="contactRow__value">ahmeddagla99@gmail.com</span>
+            </span>
+          </a>
+
+          <a class="contactRow" href="https://www.linkedin.com/in/ahmed-eldegla-2a751b184/" target="_blank" rel="noreferrer">
+            <span class="contactRow__icon"><i class="fa-brands fa-linkedin"></i></span>
+            <span>
+              <span class="contactRow__title">LinkedIn</span>
+              <span class="contactRow__value">Connect with me</span>
+            </span>
+          </a>
+
+          <a class="contactRow" href="https://github.com/AhmedEldegla" target="_blank" rel="noreferrer">
+            <span class="contactRow__icon"><i class="fa-brands fa-github"></i></span>
+            <span>
+              <span class="contactRow__title">GitHub</span>
+              <span class="contactRow__value">View my code</span>
+            </span>
+          </a>
+
+          <div class="contact__btns">
+            <a class="btn btn--primary" href="mailto:ahmeddagla99@gmail.com"><i class="fa-regular fa-paper-plane"></i> Send Email</a>
+            <a class="btn btn--ghost" href="./assets/CV.pdf" target="_blank" rel="noreferrer"><i class="fa-regular fa-file-pdf"></i> Download CV</a>
+          </div>
+        </div>
+
+        <form class="card contact__right" id="contactForm">
+          <h3 class="formTitle">Quick message</h3>
+
+          <label class="field">
+            <span>Name</span>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required />
+          </label>
+
+          <label class="field">
+            <span>Email</span>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="your@email.com" required />
+          </label>
+
+          <label class="field">
+            <span>Message</span>
+            <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
+          </label>
+
+          <button class="btn btn--primary" type="submit">
+            <i class="fa-regular fa-paper-plane"></i> Open Email Client
+          </button>
+
+          <p class="note">Static hosting friendly (mailto).</p>
+        </form>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <div>© <span id="year"></span> Ahmed Eldegla</div>
+        <div class="footer__links">
+          <a href="#home">Top</a>
+          <a href="./assets/CV.pdf" target="_blank" rel="noreferrer">CV</a>
+          <a href="https://www.linkedin.com/in/ahmed-eldegla-2a751b184/" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a href="https://github.com/AhmedEldegla" target="_blank" rel="noreferrer">GitHub</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
