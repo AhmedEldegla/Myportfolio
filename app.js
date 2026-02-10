@@ -3,8 +3,8 @@
     email: "ahmeddagla99@gmail.com",
     roleTyping: [
       ".NET Backend Developer",
-      "ASP.NET Core • Clean Architecture",
-      "SQL Server • Docker • Git"
+      "ASP.NET Core | Clean Architecture",
+      "SQL Server | Docker | Git"
     ],
     skills: [
       { icon: "fa-brands fa-microsoft", name: ".NET", hint: "ASP.NET Core" },
@@ -20,7 +20,7 @@
         desc: "Freelance platform concept with clean UI and modern flow.",
         tags: ["Platform", "Web"],
         category: "platform",
-        live: "https://depi-connect-pros.lovable.app/",
+        live: "",
         github: ""
       },
       {
@@ -28,7 +28,7 @@
         desc: "Dashboard-like experience for accounting workflows and business views.",
         tags: ["Dashboard", "Web"],
         category: "dashboard",
-        live: "https://smart-cloud-biz.lovable.app/dashboard",
+        live: "",
         github: ""
       }
     ]
@@ -173,26 +173,90 @@
 
   // Copy email + mailto form
   function initContact() {
-    $("#year").textContent = new Date().getFullYear();
+    const yearEl = $("#year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-    $("#copyEmailBtn")?.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(PROFILE.email);
-        toast("Email copied ✅");
-      } catch {
-        toast("Copy failed ❗");
-      }
-    });
+    const EMAILJS_KEY = "q-8nRXtqcr5NmmViF";
+    const EMAILJS_SERVICE_ID = "service_m1ez5zm";
+    const EMAILJS_TEMPLATE_ID = "template_4ml6ubo";
 
-    $("#contactForm")?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = $("#name").value.trim();
-      const email = $("#email").value.trim();
-      const message = $("#message").value.trim();
-      const subject = encodeURIComponent(`Portfolio Contact - ${name || "New Message"}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}\n`);
-      window.location.href = `mailto:${PROFILE.email}?subject=${subject}&body=${body}`;
-    });
+    const isConfigured = EMAILJS_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID;
+
+    if (isConfigured) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
+      script.onload = () => {
+        window.emailjs.init(EMAILJS_KEY);
+        console.log("EmailJS ready.");
+      };
+      document.head.appendChild(script);
+    }
+
+    const copyBtn = $("#copyEmailBtn");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(PROFILE.email);
+          toast("Email copied.");
+        } catch {
+          toast("Copy failed.");
+        }
+      });
+    }
+
+    const form = $("#contactForm");
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = $("#name")?.value.trim() || "";
+        const email = $("#email")?.value.trim() || "";
+        const message = $("#message")?.value.trim() || "";
+
+        if (!name || !email || !message) {
+          toast("Please fill all fields.");
+          return;
+        }
+
+        if (!isConfigured) {
+          const subject = encodeURIComponent(`Portfolio Contact - ${name}`);
+          const body = encodeURIComponent(
+            `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+          );
+          window.location.href = `mailto:${PROFILE.email}?subject=${subject}&body=${body}`;
+          return;
+        }
+
+        const btn = form.querySelector("button[type='submit']");
+        const originalText = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner" style="animation: spin 1s linear infinite;"></i> Sending...';
+
+        try {
+          const result = await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            from_name: name,
+            from_email: email,
+            message,
+            to_email: PROFILE.email
+          });
+
+          toast("Message sent successfully.");
+          form.reset();
+        } catch (err) {
+          console.error("EmailJS error:", err);
+          toast("Failed, opening mail app...");
+          const subject = encodeURIComponent(`Portfolio Contact - ${name}`);
+          const body = encodeURIComponent(
+            `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+          );
+          window.location.href = `mailto:${PROFILE.email}?subject=${subject}&body=${body}`;
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
+    }
   }
 
   // Render skills
@@ -225,9 +289,9 @@
         <a class="btn btn--ghost btn--sm" href="${p.github}" target="_blank" rel="noreferrer">
           <i class="fa-brands fa-github"></i> GitHub
         </a>` : `
-        <button class="btn btn--ghost btn--sm" type="button" data-ghost="true">
-          <i class="fa-regular fa-folder-open"></i> Repo (soon)
-        </button>`;
+        <span class="project__private" aria-label="Private case study available on request">
+          <i class="fa-regular fa-folder-open"></i> Private case study
+        </span>`;
 
       return `
         <article class="card project" data-category="${p.category}">
@@ -246,9 +310,6 @@
       `;
     }).join("");
 
-    $$('button[data-ghost="true"]', grid).forEach((b) => {
-      b.addEventListener("click", () => toast("Add GitHub repo link for this project ✅"));
-    });
   }
 
   // Filter
@@ -334,3 +395,4 @@
 
   document.addEventListener("DOMContentLoaded", boot);
 })();
+

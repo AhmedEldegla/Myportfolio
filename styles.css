@@ -457,6 +457,19 @@ strong{ color: color-mix(in srgb, var(--accent) 70%, var(--text)); }
   white-space: nowrap;
 }
 .project__links{ margin-top: 12px; display:flex; gap: 10px; flex-wrap:wrap; }
+.project__private{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  color: color-mix(in srgb, var(--text) 80%, transparent);
+  font-weight: 900;
+  font-size: 13px;
+  cursor: default;
+}
 
 /* Contact */
 .contact{
@@ -557,6 +570,12 @@ html[data-theme="light"] .toast{ background: rgba(10,14,23,.78); }
 @media (max-width: 520px){
   .skills{ grid-template-columns: repeat(2, 1fr); }
   .photoCard__img{ height: 240px; }
+}
+
+/* Spinner animation for loading states */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Reduced motion */
