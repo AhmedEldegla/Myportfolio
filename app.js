@@ -572,7 +572,21 @@
     });
   }
 
+  function initEntryZoom() {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      document.body.classList.add("is-entered");
+      return;
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.add("is-entered");
+      });
+    });
+  }
+
   function boot() {
+    initEntryZoom();
     initTheme();
     initMobileMenu();
     initActiveNav();

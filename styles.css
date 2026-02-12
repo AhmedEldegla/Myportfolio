@@ -40,6 +40,17 @@ body{
   color:var(--text);
   overflow-x:hidden;
 }
+/* Entry zoom on first load */
+body main.container{
+  transform: scale(1.02);
+  opacity: .01;
+  transition: transform .65s var(--ease-out), opacity .45s ease;
+  transform-origin: 50% 0%;
+}
+body.is-entered main.container{
+  transform: scale(1);
+  opacity: 1;
+}
 h1,h2,h3,.brand,.section__title,.project__title,.xp__title{
   font-family:"Space Grotesk","Source Sans 3",system-ui,sans-serif;
 }
@@ -694,6 +705,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){
   html{ scroll-behavior:auto; }
+  body main.container{ transition:none !important; transform:none !important; opacity:1 !important; }
   .blob{ animation:none !important; }
   .caret{ animation:none !important; }
   .photoCard__shine{ animation:none !important; opacity:.25; }
