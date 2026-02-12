@@ -51,7 +51,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Icons -->
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" as="style">
@@ -159,7 +159,7 @@
 
         <div class="quick reveal" aria-label="Quick highlights">
           <div class="quick__item">
-            <div class="quick__kpi">5+</div>
+            <div class="quick__kpi" data-target="5">0+</div>
             <div class="quick__txt">Years Freelancing</div>
           </div>
           <div class="quick__item">
@@ -220,10 +220,6 @@
       </header>
 
       <div class="xp reveal">
-       
-
-        </article>
-
         <article class="card xp__item">
           <div class="xp__top">
             <div>
@@ -297,6 +293,7 @@
       </div>
 
       <div class="projects reveal" id="projectsGrid" aria-live="polite"></div>
+      <div id="projectsPagination" class="pagination reveal" aria-hidden="true"></div>
     </section>
 
     <!-- CONTACT -->
@@ -378,6 +375,8 @@
     </footer>
   </main>
 
+  <div class="cursor cursor--dot" id="cursorDot" aria-hidden="true"></div>
+  <div class="cursor cursor--ring" id="cursorRing" aria-hidden="true"></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

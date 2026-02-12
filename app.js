@@ -37,6 +37,10 @@
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
+  // Projects pagination state
+  const PAGE_SIZE = 4;
+  const projectState = { page: 1, filter: "all" };
+
   // Toast
   function toast(msg) {
     const t = $("#toast");
@@ -142,11 +146,76 @@
       els.forEach((el) => el.classList.add("show"));
       return;
     }
+    els.forEach((el, idx) => {
+      if (!el.style.getPropertyValue("--reveal-delay")) {
+        el.style.setProperty("--reveal-delay", `${Math.min(idx * 28, 220)}ms`);
+      }
+    });
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("show")),
       { threshold: 0.12 }
     );
     els.forEach((el) => io.observe(el));
+  }
+
+  // Desktop custom cursor
+  function initCursor() {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (reduce || !finePointer) return;
+
+    const dot = $("#cursorDot");
+    const ring = $("#cursorRing");
+    if (!dot || !ring) return;
+
+    document.body.classList.add("cursor-enhanced");
+
+    const state = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const ringPos = { x: state.x, y: state.y };
+    let raf = 0;
+
+    const show = () => {
+      dot.style.opacity = "1";
+      ring.style.opacity = "1";
+    };
+    const hide = () => {
+      dot.style.opacity = "0";
+      ring.style.opacity = "0";
+      ring.classList.remove("is-hover", "is-press");
+    };
+
+    const animate = () => {
+      ringPos.x += (state.x - ringPos.x) * 0.2;
+      ringPos.y += (state.y - ringPos.y) * 0.2;
+      dot.style.left = `${state.x}px`;
+      dot.style.top = `${state.y}px`;
+      ring.style.left = `${ringPos.x}px`;
+      ring.style.top = `${ringPos.y}px`;
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+
+    window.addEventListener("mousemove", (e) => {
+      state.x = e.clientX;
+      state.y = e.clientY;
+      show();
+    }, { passive: true });
+    window.addEventListener("mouseout", (e) => {
+      if (!e.relatedTarget) hide();
+    });
+    window.addEventListener("blur", hide);
+
+    const hoverSelector = "a, button, input, textarea, .btn, .filter, .nav__link, .contactRow, .project, .skill";
+    document.addEventListener("mouseover", (e) => {
+      if (e.target.closest(hoverSelector)) ring.classList.add("is-hover");
+    });
+    document.addEventListener("mouseout", (e) => {
+      if (e.target.closest(hoverSelector)) ring.classList.remove("is-hover");
+    });
+    document.addEventListener("mousedown", () => ring.classList.add("is-press"));
+    document.addEventListener("mouseup", () => ring.classList.remove("is-press"));
+
+    window.addEventListener("beforeunload", () => cancelAnimationFrame(raf));
   }
 
   // Typing
@@ -274,11 +343,22 @@
   }
 
   // Render projects
-  function renderProjects() {
+  function renderProjects(page = projectState.page, size = PAGE_SIZE, filter = projectState.filter) {
     const grid = $("#projectsGrid");
+    const pager = $("#projectsPagination");
     if (!grid) return;
 
-    grid.innerHTML = PROFILE.projects.map((p) => {
+    // Filter projects
+    const filtered = PROFILE.projects.filter((p) => filter === "all" || p.category === filter);
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / size));
+    if (page > totalPages) page = totalPages;
+    projectState.page = page;
+
+    const start = (page - 1) * size;
+    const slice = filtered.slice(start, start + size);
+
+    grid.innerHTML = slice.map((p, idx) => {
       const tags = (p.tags || []).map((t) => `<span class="tag">${t}</span>`).join("");
       const liveBtn = p.live ? `
         <a class="btn btn--primary btn--sm" href="${p.live}" target="_blank" rel="noreferrer">
@@ -293,8 +373,11 @@
           <i class="fa-regular fa-folder-open"></i> Private case study
         </span>`;
 
+      // Support staggered reveal: set --delay based on index
+      const delay = idx * 60;
+
       return `
-        <article class="card project" data-category="${p.category}">
+        <article class="card project" data-category="${p.category}" data-delay="${delay}" style="--delay:${delay}ms">
           <div class="project__row">
             <div>
               <h3 class="project__title">${p.title}</h3>
@@ -310,29 +393,71 @@
       `;
     }).join("");
 
+    // Update pagination controls
+    if (pager) {
+      pager.setAttribute("aria-hidden", totalPages <= 1 ? "true" : "false");
+      pager.innerHTML = renderPaginationHtml(totalPages, page);
+      bindPaginationEvents(pager, totalPages);
+    }
+
+    // Apply staggered reveal for newly inserted items
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    Array.from(grid.querySelectorAll('.project')).forEach((el) => {
+      const d = parseInt(el.getAttribute('data-delay')) || 0;
+      el.style.setProperty('--delay', `${d}ms`);
+      if (reduce) {
+        el.classList.add('show');
+      } else {
+        el.classList.add('reveal');
+        setTimeout(() => el.classList.add('show'), d + 40);
+      }
+    });
+  }
+
+  function renderPaginationHtml(totalPages, current) {
+    if (totalPages <= 1) return "";
+    let html = `<button class=\"pagination__nav\" data-action=\"prev\" aria-label=\"Previous page\">Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      html += ` <button class=\"pagination__dot ${i === current ? 'active' : ''}\" data-page=\"${i}\" aria-label=\"Page ${i}\"></button>`;
+    }
+    html += ` <button class=\"pagination__nav\" data-action=\"next\" aria-label=\"Next page\">Next</button>`;
+    return html;
+  }
+
+  function bindPaginationEvents(container, totalPages) {
+    container.querySelectorAll('[data-page]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const p = Number(b.dataset.page);
+        projectState.page = p;
+        renderProjects(p, PAGE_SIZE, projectState.filter);
+      });
+    });
+    container.querySelectorAll('[data-action]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const action = b.dataset.action;
+        if (action === 'prev' && projectState.page > 1) projectState.page--;
+        if (action === 'next' && projectState.page < totalPages) projectState.page++;
+        renderProjects(projectState.page, PAGE_SIZE, projectState.filter);
+      });
+    });
   }
 
   // Filter
   function initProjectFilter() {
     const btns = $$(".filter");
-    const cards = () => $$(".project");
-
-    const apply = (filter) => {
-      cards().forEach((c) => {
-        const cat = c.getAttribute("data-category");
-        c.style.display = (filter === "all" || cat === filter) ? "" : "none";
-      });
-    };
 
     btns.forEach((b) => {
       b.addEventListener("click", () => {
         btns.forEach((x) => x.classList.remove("active"));
         b.classList.add("active");
-        apply(b.dataset.filter);
+        projectState.filter = b.dataset.filter || "all";
+        projectState.page = 1;
+        renderProjects(projectState.page, PAGE_SIZE, projectState.filter);
       });
     });
 
-    apply("all");
+    // set initial active
+    btns.forEach((b) => b.classList.toggle("active", b.dataset.filter === projectState.filter));
   }
 
   // Smooth anchors (stable on mobile)
@@ -376,11 +501,83 @@
     card.addEventListener("touchstart", onLeave, { passive: true });
   }
 
+  // Animated counters (quick KPIs)
+  function initCounters() {
+    const els = Array.from(document.querySelectorAll('.quick__kpi[data-target]'));
+    if (!els.length) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      els.forEach((el) => {
+        const t = Number(el.dataset.target) || 0;
+        const suffix = String(el.textContent).trim().endsWith('+') ? '+' : '';
+        el.textContent = `${t}${suffix}`;
+      });
+      return;
+    }
+
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        obs.unobserve(el);
+        const target = Number(el.dataset.target) || 0;
+        const suffix = String(el.textContent).trim().endsWith('+') ? '+' : '';
+
+        const duration = 900;
+        const start = performance.now();
+
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const value = Math.round(eased * target);
+          el.textContent = `${value}${suffix}`;
+          if (t < 1) requestAnimationFrame(tick);
+          else el.classList.add('animate');
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.2 });
+
+    els.forEach((el) => io.observe(el));
+  }
+
+  // Button ripple micro-interaction
+  function initButtonRipples() {
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('.btn');
+      if (!b) return;
+      const rect = b.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      let r = b.querySelector('.ripple');
+      if (!r) {
+        r = document.createElement('span');
+        r.className = 'ripple';
+        b.appendChild(r);
+      }
+      r.classList.remove('show');
+      r.style.left = `${x}px`;
+      r.style.top = `${y}px`;
+      r.style.width = r.style.height = '8px';
+      // force reflow
+      // expand
+      requestAnimationFrame(() => {
+        const size = Math.max(rect.width, rect.height) * 2;
+        r.style.width = r.style.height = `${size}px`;
+        r.classList.add('show');
+        setTimeout(() => r.classList.remove('show'), 450);
+      });
+    });
+  }
+
   function boot() {
     initTheme();
     initMobileMenu();
     initActiveNav();
     initReveal();
+    initCursor();
     initContact();
     initSmoothAnchors();
 
@@ -391,6 +588,8 @@
     renderProjects();
     initProjectFilter();
     initPhotoTilt();
+    initCounters();
+    initButtonRipples();
   }
 
   document.addEventListener("DOMContentLoaded", boot);
