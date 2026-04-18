@@ -30,6 +30,22 @@
         category: "dashboard",
         live: "",
         github: ""
+      },
+      {
+        title: "System Cashier POS System",
+        desc: "Point-of-sale backend system for cashier workflows, sales operations, and business data management.",
+        tags: ["POS", ".NET API", "SQL Server"],
+        category: "system",
+        live: "",
+        github: ""
+      },
+      {
+        title: "Mo7amek",
+        desc: "Lawyer management system for organizing cases, clients, appointments, and office workflows.",
+        tags: ["Legal System", ".NET API", "SQL Server"],
+        category: "system",
+        live: "",
+        github: ""
       }
     ]
   };
