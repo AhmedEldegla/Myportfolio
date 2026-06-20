@@ -16,12 +16,12 @@
     ],
     projects: [
       {
-        title: "Depi FreeLance Platform",
-        desc: "Freelance platform concept with clean UI and modern flow.",
-        tags: ["Platform", "Web"],
+        title: "Depi Freelance Platform",
+        desc: "Graduation project showcasing a freelance marketplace flow with a modern UI and backend structure.",
+        tags: ["Graduation Project", "Platform", "Web"],
         category: "platform",
         live: "",
-        github: ""
+        github: "https://github.com/AhmedEldegla/Depi"
       },
       {
         title: "Smart Accountant",
