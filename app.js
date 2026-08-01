@@ -2,17 +2,20 @@
   const PROFILE = {
     email: "ahmeddagla99@gmail.com",
     roleTyping: [
-      ".NET Backend Developer",
-      "ASP.NET Core | Clean Architecture",
-      "SQL Server | Docker | Git"
+      "Junior .NET Backend Developer",
+      "C# | .NET | Entity Framework | LINQ",
+      "C++ | Real-time Networking | Performance"
     ],
     skills: [
-      { icon: "fa-brands fa-microsoft", name: ".NET", hint: "ASP.NET Core" },
-      { icon: "fa-solid fa-database", name: "SQL Server", hint: "T-SQL" },
-      { icon: "fa-brands fa-docker", name: "Docker", hint: "Containers" },
-      { icon: "fa-brands fa-git-alt", name: "Git", hint: "Version control" },
-      { icon: "fa-brands fa-github", name: "GitHub", hint: "Repos" },
-      { icon: "fa-brands fa-gitlab", name: "GitLab", hint: "CI/CD" }
+      { icon: "fa-brands fa-microsoft", name: "C#", hint: ".NET" },
+      { icon: "fa-solid fa-database", name: "Entity Framework", hint: "LINQ · ORM" },
+      { icon: "fa-solid fa-table", name: "SQL", hint: "Fundamentals" },
+      { icon: "fa-solid fa-plug", name: "RESTful APIs", hint: "Concepts" },
+      { icon: "fa-solid fa-code", name: "C++", hint: "Games & Systems" },
+      { icon: "fa-solid fa-diagram-project", name: "Data Structures", hint: "Algorithms" },
+      { icon: "fa-solid fa-network-wired", name: "Networking", hint: "Real-time · Packets" },
+      { icon: "fa-solid fa-bug", name: "Debugging", hint: "Memory analysis" },
+      { icon: "fa-brands fa-git-alt", name: "Git", hint: "GitHub · Version control" }
     ],
     projects: [
       {
