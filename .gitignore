@@ -6,3 +6,8 @@
 /.vs/Myportfolio/FileContentIndex
 /.vs/Myportfolio/config
 /.vs
+
+# Local secrets
+.dev.vars
+.dev.vars.*
+.env
