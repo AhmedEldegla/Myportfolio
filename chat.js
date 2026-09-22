@@ -7,7 +7,7 @@
   const EMAIL = "ahmeddagla99@gmail.com";
   const STORE_KEY = "ae_chat_v1";
   const GREETING = "Hi! I'm Ahmed's AI assistant. Ask me about his experience or projects, or leave a message and I'll pass it to him.";
-  const SUGGESTIONS = ["What has Ahmed built?", "Tell me about his .NET experience", "I'd like to hire Ahmed"];
+  const SUGGESTIONS = ["What has Ahmed built?", "Tell me about his .NET experience", "Can I book a call?"];
 
   const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
   const endpoint = isLocal ? LOCAL_ENDPOINT : ENDPOINT;
@@ -37,6 +37,7 @@
     let inList = false;
     for (const raw of lines) {
       let line = raw
+        .replace(/\[([^\]]+)\]\(#([a-z-]+)\)/g, '<a href="#$2" class="msg__jump">$1</a>')
         .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>')
         .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noreferrer">$2</a>')
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
@@ -243,6 +244,14 @@
   launch.addEventListener("click", () => setOpen(panel.hidden));
   root.querySelector(".chat__close").addEventListener("click", () => setOpen(false));
   panel.addEventListener("keydown", (e) => e.key === "Escape" && setOpen(false));
+  // In-page links from the assistant (e.g. "Book a call") close the chat first
+  log.addEventListener("click", (e) => {
+    const jump = e.target.closest("a.msg__jump");
+    if (!jump) return;
+    e.preventDefault();
+    setOpen(false);
+    document.querySelector(jump.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   chips.addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
     if (chip) send(chip.textContent);
