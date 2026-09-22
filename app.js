@@ -144,13 +144,13 @@
       const stack = p.stack.map((s) => `<li>${s}</li>`).join("");
       const links = [];
       if (p.live) {
-        links.push(`<a class="plink" href="${p.live}" target="_blank" rel="noreferrer">Live demo <svg class="ico ico--sm"><use href="#i-arrow"/></svg></a>`);
+        links.push(`<a class="plink" href="${p.live}" target="_blank" rel="noreferrer">Live demo <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a>`);
       }
       if (p.github) {
-        links.push(`<a class="plink" href="${p.github}" target="_blank" rel="noreferrer"><svg class="ico"><use href="#i-github"/></svg> Source <svg class="ico ico--sm"><use href="#i-arrow"/></svg></a>`);
+        links.push(`<a class="plink" href="${p.github}" target="_blank" rel="noreferrer"><svg width="18" height="18" class="ico"><use href="#i-github"/></svg> Source <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a>`);
       }
       if (!links.length) {
-        links.push(`<span class="plink plink--muted"><svg class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span>`);
+        links.push(`<span class="plink plink--muted"><svg width="18" height="18" class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span>`);
       }
 
       return `

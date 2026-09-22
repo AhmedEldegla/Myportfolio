@@ -75,7 +75,7 @@
           <span>AI · answers about Ahmed's work</span>
         </div>
         <button class="chat__close iconBtn" type="button" aria-label="Close chat">
-          <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </button>
       </header>
       <div class="chat__log" aria-live="polite"></div>
@@ -83,7 +83,7 @@
       <form class="chat__form">
         <textarea class="chat__input" rows="1" maxlength="1200" placeholder="Ask about Ahmed's work…" aria-label="Your message"></textarea>
         <button class="chat__send" type="submit" aria-label="Send">
-          <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </form>
       <p class="chat__note">AI can make mistakes. For anything important, email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
