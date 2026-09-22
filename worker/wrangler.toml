@@ -1,0 +1,11 @@
+name = "ahmed-portfolio-chat"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+
+# Public, non-secret settings. The API key is NOT here:
+# it's stored with `npx wrangler secret put GEMINI_API_KEY`.
+[vars]
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+ALLOWED_ORIGINS = "https://www.ahmedeldegla.com,https://ahmedeldegla.com,https://ahmedeldegla.github.io,http://localhost:5173"
