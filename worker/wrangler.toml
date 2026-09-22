@@ -9,3 +9,11 @@ preview_urls = false
 [vars]
 GEMINI_MODEL = "gemini-3.5-flash-lite"
 ALLOWED_ORIGINS = "https://www.ahmedeldegla.com,https://ahmedeldegla.com,https://ahmedeldegla.github.io,http://localhost:5173"
+
+# Bookings database (Cloudflare D1, free tier).
+# Created with: npx wrangler d1 create portfolio-bookings
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-bookings"
+database_id = "82e4fa45-1998-46c6-9e86-948e34604444"
+migrations_dir = "migrations"

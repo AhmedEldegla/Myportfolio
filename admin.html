@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Bookings admin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <script>
+    try {
+      var t = localStorage.getItem("ae_theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=3" />
+  <style>
+    [hidden]{ display:none !important; }
+    .admin{ padding:48px 0 80px; }
+    .admin__head{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:32px; }
+    .admin__head h1{ font-size:2rem; font-weight:600; letter-spacing:-.03em; }
+    .login{ max-width:380px; display:grid; gap:16px; }
+    .tabs{ display:flex; gap:6px; }
+    .tabs button{ height:36px; padding:0 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted); font:500 14px/1 var(--font); cursor:pointer; }
+    .tabs button.is-active{ background:var(--text); color:var(--bg); border-color:var(--text); }
+    .list{ display:grid; gap:12px; }
+    .bk{ display:grid; grid-template-columns:200px 1fr auto; gap:20px; align-items:start; padding:20px; border:1px solid var(--line); border-radius:var(--r); background:var(--surface); }
+    .bk.is-cancelled{ opacity:.5; }
+    .bk__when strong{ display:block; font-size:1.05rem; }
+    .bk__when span{ font-size:13px; color:var(--faint); }
+    .bk__who a{ color:var(--accent); }
+    .bk__topic{ margin-top:6px; color:var(--muted); font-size:15px; white-space:pre-wrap; }
+    .bk__actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .pill{ font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:3px 8px; border-radius:999px; background:var(--surface-2); color:var(--muted); }
+    .empty{ color:var(--muted); padding:40px 0; }
+    .err{ color:#e5736f; font-size:14px; min-height:1.2em; }
+    @media (max-width: 720px){ .bk{ grid-template-columns:1fr; } .bk__actions{ justify-content:flex-start; } }
+  </style>
+</head>
+<body>
+  <main class="admin container">
+    <div class="admin__head">
+      <h1>Bookings</h1>
+      <div id="bar" hidden style="display:flex;gap:10px;align-items:center">
+        <div class="tabs"><button type="button" data-scope="upcoming" class="is-active">Upcoming</button><button type="button" data-scope="past">Past</button></div>
+        <button class="btn btn--line btn--sm" id="refresh" type="button">Refresh</button>
+        <button class="btn btn--line btn--sm" id="logout" type="button">Log out</button>
+      </div>
+    </div>
+
+    <form class="login" id="login">
+      <label class="field"><span>Admin password</span><input id="pw" type="password" autocomplete="current-password" required /></label>
+      <button class="btn btn--solid" type="submit">Sign in</button>
+      <p class="err" id="loginErr" role="alert"></p>
+    </form>
+
+    <div class="list" id="list" hidden></div>
+  </main>
+
+  <script>
+  (() => {
+    const API = ["localhost", "127.0.0.1"].includes(location.hostname)
+      ? "http://localhost:8787"
+      : "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev";
+    const KEY = "ae_admin_pw";
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    let pw = "";
+    let scope = "upcoming";
+    let tz = "Africa/Cairo";
+    try { pw = sessionStorage.getItem(KEY) || ""; } catch {}
+
+    const api = (path, opts = {}) => fetch(API + path, { ...opts, headers: { ...(opts.headers || {}), Authorization: "Bearer " + pw } });
+
+    function showApp(on) {
+      $("#login").hidden = on;
+      $("#bar").hidden = !on;
+      $("#list").hidden = !on;
+    }
+
+    function fmt(iso, zone) {
+      return new Date(iso).toLocaleString("en-GB", { timeZone: zone, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    }
+
+    function render(bookings) {
+      const list = $("#list");
+      if (!bookings.length) {
+        list.innerHTML = `<p class="empty">No ${scope} bookings.</p>`;
+        return;
+      }
+      list.innerHTML = bookings.map((b) => {
+        const subject = encodeURIComponent("Your call with Ahmed Eldegla");
+        const body = encodeURIComponent(`Hi ${b.name},\n\nThanks for booking a call on ${fmt(b.start_utc, tz)} (${tz}).\n\nHere's the meeting link: \n\nTalk soon,\nAhmed`);
+        const cancelled = b.status !== "confirmed";
+        return `
+          <article class="bk${cancelled ? " is-cancelled" : ""}">
+            <div class="bk__when">
+              <strong>${esc(fmt(b.start_utc, tz))}</strong>
+              <span>${esc(tz)}</span>
+            </div>
+            <div class="bk__who">
+              <div><strong>${esc(b.name)}</strong> · <a href="mailto:${esc(b.email)}">${esc(b.email)}</a> ${cancelled ? '<span class="pill">cancelled</span>' : ""}</div>
+              ${b.topic ? `<p class="bk__topic">${esc(b.topic)}</p>` : ""}
+            </div>
+            <div class="bk__actions">
+              ${cancelled ? "" : `
+                <a class="btn btn--solid btn--sm" href="mailto:${esc(b.email)}?subject=${subject}&body=${body}">Send meeting link</a>
+                <button class="btn btn--line btn--sm" type="button" data-cancel="${esc(b.id)}">Cancel</button>`}
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    async function load() {
+      $("#list").innerHTML = '<p class="empty">Loading…</p>';
+      try {
+        const res = await api(`/admin/bookings?scope=${scope}`);
+        if (res.status === 401) return logout("Wrong password.");
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        tz = data.timezone || tz;
+        showApp(true);
+        render(data.bookings || []);
+      } catch (e) {
+        $("#list").innerHTML = `<p class="empty">Couldn't load bookings (${esc(e.message)}).</p>`;
+      }
+    }
+
+    function logout(msg = "") {
+      pw = "";
+      try { sessionStorage.removeItem(KEY); } catch {}
+      showApp(false);
+      $("#loginErr").textContent = msg;
+      $("#pw").value = "";
+      $("#pw").focus();
+    }
+
+    $("#login").addEventListener("submit", (e) => {
+      e.preventDefault();
+      pw = $("#pw").value;
+      try { sessionStorage.setItem(KEY, pw); } catch {}
+      $("#loginErr").textContent = "";
+      load();
+    });
+    $("#logout").addEventListener("click", () => logout());
+    $("#refresh").addEventListener("click", load);
+    document.querySelector(".tabs").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-scope]");
+      if (!b) return;
+      scope = b.dataset.scope;
+      document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("is-active", x === b));
+      load();
+    });
+    $("#list").addEventListener("click", async (e) => {
+      const b = e.target.closest("[data-cancel]");
+      if (!b || !confirm("Cancel this booking? The time slot will open up again. Remember to email the client.")) return;
+      b.disabled = true;
+      const res = await api(`/admin/bookings/${b.dataset.cancel}/cancel`, { method: "POST" });
+      if (res.status === 401) return logout("Session expired.");
+      load();
+    });
+
+    if (pw) load(); else showApp(false);
+  })();
+  </script>
+</body>
+</html>
