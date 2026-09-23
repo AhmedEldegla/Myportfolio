@@ -7,7 +7,7 @@
         kind: "Backend API · Team of 5 · 2026",
         featured: true,
         desc: "The backend of a freelance marketplace: projects, proposals, milestone contracts, escrow wallets, messaging, reviews, guilds and communities. I was the team's top contributor and repository owner.",
-        stats: [["85+", "REST endpoints"], ["17", "controllers"], ["4", "Clean Architecture layers"], ["5", "developers"]],
+        stats: [["17", "controllers"], ["4", "Clean Architecture layers"], ["5", "developers"]],
         bullets: [
           "Structured the solution in 4 layers (Domain, Application, Infrastructure, API) with Clean Architecture and CQRS via MediatR.",
           "Implemented authentication and authorization with ASP.NET Core Identity and JWT, including role/permission management and user sessions.",
