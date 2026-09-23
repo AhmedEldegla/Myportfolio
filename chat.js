@@ -248,9 +248,21 @@
   log.addEventListener("click", (e) => {
     const jump = e.target.closest("a.msg__jump");
     if (!jump) return;
+    // "#book" is handled by booking.js (opens the booking window); other anchors scroll
+    const handled = e.defaultPrevented;
     e.preventDefault();
-    setOpen(false);
-    document.querySelector(jump.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!handled) {
+      setOpen(false);
+      document.querySelector(jump.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+  // Close the chat when the booking window opens
+  document.addEventListener("ae:booking-open", () => {
+    if (!panel.hidden) {
+      panel.hidden = true;
+      launch.setAttribute("aria-expanded", "false");
+      root.classList.remove("is-open");
+    }
   });
   chips.addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");

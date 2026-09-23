@@ -3,10 +3,18 @@
     email: "ahmeddagla99@gmail.com",
     projects: [
       {
-        title: "Depi Freelance Platform",
-        kind: "Graduation project",
-        desc: "A freelance marketplace covering the core flow between clients and freelancers, built on a layered .NET backend with a modern web front end.",
-        stack: ["C#", ".NET", "Entity Framework", "SQL Server"],
+        title: "DEPI Smart Freelance Platform",
+        kind: "Backend API · Team of 5 · 2026",
+        featured: true,
+        desc: "The backend of a freelance marketplace: projects, proposals, milestone contracts, escrow wallets, messaging, reviews, guilds and communities. I was the team's top contributor and repository owner.",
+        stats: [["85+", "REST endpoints"], ["17", "controllers"], ["4", "Clean Architecture layers"], ["5", "developers"]],
+        bullets: [
+          "Structured the solution in 4 layers (Domain, Application, Infrastructure, API) with Clean Architecture and CQRS via MediatR.",
+          "Implemented authentication and authorization with ASP.NET Core Identity and JWT, including role/permission management and user sessions.",
+          "Designed the SQL Server data model with EF Core, fixed shadow foreign-key mapping issues, and delivered SQL scripts and backups for the data analysis team.",
+          "Added global exception-handling middleware, MediatR logging behaviors, request validation, rate limiting, health checks, and GitHub Actions workflows."
+        ],
+        stack: ["ASP.NET Core 8", "EF Core", "SQL Server", "MediatR", "JWT", "Identity", "AutoMapper", "FluentValidation", "Swagger"],
         live: "",
         github: "https://github.com/AhmedEldegla/Depi"
       },
@@ -36,10 +44,12 @@
       }
     ],
     skills: [
-      { group: "Backend", items: ["C#", ".NET", "ASP.NET Web API", "Entity Framework", "LINQ", "RESTful APIs"] },
-      { group: "Data", items: ["SQL Server", "SQL", "Data modeling"] },
-      { group: "Systems", items: ["C++", "Real-time networking", "Packet processing", "Performance optimization"] },
-      { group: "Craft", items: ["Debugging", "Memory analysis", "Reverse engineering", "Data structures & algorithms", "Git & GitHub"] }
+      { group: "Backend", items: ["C#", "ASP.NET Core Web API (.NET 8)", "RESTful APIs", "Entity Framework Core", "LINQ", "MediatR", "AutoMapper", "FluentValidation"] },
+      { group: "Architecture", items: ["Clean Architecture", "CQRS", "Repository Pattern", "Result Pattern", "Domain Events", "Dependency Injection", "SOLID · OOP"] },
+      { group: "Security", items: ["JWT Authentication", "ASP.NET Core Identity", "Role & permission-based authorization", "Rate limiting"] },
+      { group: "Databases", items: ["SQL Server", "T-SQL", "EF Core Migrations", "Database design & relationships"] },
+      { group: "Systems", items: ["C++", "Multithreading", "Data structures & algorithms", "Real-time networking", "Debugging", "Performance optimization"] },
+      { group: "Tools", items: ["Git & GitHub", "GitHub Actions", "Swagger / OpenAPI", "Visual Studio", "SSMS"] }
     ]
   };
 
@@ -153,13 +163,22 @@
         links.push(`<span class="plink plink--muted"><svg width="18" height="18" class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span>`);
       }
 
+      const stats = p.stats
+        ? `<dl class="pstats">${p.stats.map(([n, l]) => `<div><dt>${l}</dt><dd>${n}</dd></div>`).join("")}</dl>`
+        : "";
+      const bullets = p.bullets
+        ? `<ul class="project__bullets">${p.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>`
+        : "";
+
       return `
-        <article class="project reveal">
+        <article class="project${p.featured ? " project--featured" : ""} reveal">
           <div class="project__num mono">${String(i + 1).padStart(2, "0")}</div>
           <div class="project__main">
             <p class="project__kind mono">${p.kind}</p>
             <h3 class="project__title">${p.title}</h3>
             <p class="project__desc">${p.desc}</p>
+            ${stats}
+            ${bullets}
             <ul class="stack">${stack}</ul>
           </div>
           <div class="project__links">${links.join("")}</div>
