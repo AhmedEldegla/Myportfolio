@@ -58,7 +58,7 @@
     if (state.view === "loading") {
       html = `<div class="bm__msg"><span class="typing"><i></i><i></i><i></i></span> Loading…</div>`;
     } else if (state.view === "error") {
-      html = `<div class="bm__msg">Online booking isn't available right now.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</div>`;
+      html = `<div class="bm__msg"><p>Online booking isn't available right now.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</p></div>`;
     } else if (state.view === "types") {
       html = viewTypes();
     } else if (state.view === "pick") {
@@ -88,7 +88,7 @@
   function viewPick() {
     const back = state.config.types.length > 1 ? `<button type="button" class="bm__back" data-back="types">${icon("i-back")} Meeting type</button>` : "";
     if (!state.picker.slots.length) {
-      return `${back}<div class="bm__msg">No open times in the next ${state.config.daysAhead} days.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</div>`;
+      return `${back}<div class="bm__msg"><p>No open times in the next ${state.config.daysAhead} days.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</p></div>`;
     }
     return `${back}${state.notice ? `<p class="bm__notice" role="alert">${esc(state.notice)}</p>` : ""}${B.pickerHtml(state.picker)}`;
   }
@@ -133,7 +133,8 @@
     const token = (b.manageUrl || "").split("t=")[1] || "";
     const gcal = B.googleLink({
       title: `${b.type.name} with Ahmed Eldegla`, start: b.start, end: b.end,
-      details: `Join: ${b.meetUrl}\nReschedule or cancel: ${b.manageUrl}`, location: b.meetUrl
+      details: b.meetUrl ? `Join: ${b.meetUrl}\nReschedule or cancel: ${b.manageUrl}` : `Ahmed will email you the video call link.\nQuestions: ${EMAIL}`,
+      location: b.meetUrl || ""
     });
     return `
       <div class="bm__done">
@@ -144,13 +145,15 @@
           <p class="bm__summaryDate">${fmtLong(b.start)}</p>
           <p class="bm__summaryTime">${fmtTime(b.start)} – ${fmtTime(b.end)} <span class="muted">· ${esc(B.tzLabel)}</span></p>
         </div>
-        <div class="bm__link">
+        ${b.meetUrl ? `<div class="bm__link">
           ${icon("i-video")}<a href="${esc(b.meetUrl)}" target="_blank" rel="noreferrer">${esc(b.meetUrl.replace(/^https:\/\//, ""))}</a>
           <button type="button" class="iconBtn" data-copy="${esc(b.meetUrl)}" aria-label="Copy video link">${icon("i-copy")}</button>
-        </div>
+        </div>` : ""}
         <p class="muted bm__fine">${b.emailed
           ? `A confirmation with the calendar invite is on its way to <strong>${esc(b.email)}</strong>.`
-          : "Save the video link above. You can also add the call to your calendar now."}</p>
+          : b.meetUrl
+            ? "Save the video link above. You can also add the call to your calendar now."
+            : `Ahmed will email the video call link to <strong>${esc(b.email)}</strong>. Questions: <a href="mailto:${EMAIL}">${EMAIL}</a>.`}</p>
         <div class="bm__cal">
           <a class="btn btn--line btn--sm" href="${gcal}" target="_blank" rel="noreferrer">Google Calendar</a>
           ${token ? `<a class="btn btn--line btn--sm" href="${API}/manage/ics?t=${token}">Apple / Outlook (.ics)</a>` : ""}
@@ -165,10 +168,28 @@
     if (state.config) return true;
     try {
       const res = await fetch(`${API}/booking/config`);
+      if (res.ok) {
+        state.config = await res.json();
+        state.ownerTz = state.config.timezone || state.ownerTz;
+        return state.config.types.length > 0;
+      }
+    } catch {}
+    // Older backend without meeting types: offer its single call type, so booking never goes down
+    try {
+      const res = await fetch(`${API}/slots`);
       if (!res.ok) throw new Error(String(res.status));
-      state.config = await res.json();
-      state.ownerTz = state.config.timezone || state.ownerTz;
-      return state.config.types.length > 0;
+      const data = await res.json();
+      state.legacy = true;
+      state.ownerTz = data.timezone || state.ownerTz;
+      state.config = {
+        timezone: state.ownerTz, daysAhead: 14,
+        types: [{
+          id: "call", name: "Intro call", duration: data.slotMinutes || 30,
+          description: "Project scoping, hiring, or technical questions.",
+          questions: [{ id: "topic", label: "What would you like to discuss?", type: "textarea", required: false }]
+        }]
+      };
+      return true;
     } catch {
       return false;
     }
@@ -184,7 +205,7 @@
   async function loadSlots(notice = "") {
     if (!state.picker.slots.length) { state.view = "loading"; render(); }
     try {
-      const res = await fetch(`${API}/slots?type=${encodeURIComponent(state.type.id)}`);
+      const res = await fetch(state.legacy ? `${API}/slots` : `${API}/slots?type=${encodeURIComponent(state.type.id)}`);
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
       state.picker.slots = data.slots || [];
@@ -227,12 +248,14 @@
       const res = await fetch(`${API}/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: state.type.id, start: state.picker.slot, name, email, tz: B.tz, answers, website: f.website.value })
+        body: JSON.stringify(state.legacy
+          ? { start: state.picker.slot, name, email, topic: answers.topic || "", website: f.website.value }
+          : { type: state.type.id, start: state.picker.slot, name, email, tz: B.tz, answers, website: f.website.value })
       });
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.ok) {
-        state.booked = { ...data, name, email };
+        state.booked = { type: state.type, ...data, name, email };
         state.picker.slots = state.picker.slots.filter((s) => s !== state.picker.slot);
         state.notice = "";
         state.draft = { name: "", email: "", answers: {} };
@@ -244,7 +267,7 @@
           const lines = (state.type.questions || []).filter((q) => answers[q.id]).map((q) => `${q.label}: ${answers[q.id]}`).join("\n");
           window.AE_sendEmail?.({
             name, email,
-            message: `[New booking: ${state.type.name}]\nWhen: ${new Date(data.start).toLocaleString("en-GB", { timeZone: state.ownerTz, dateStyle: "full", timeStyle: "short" })} (${state.ownerTz}), ${state.type.duration} min\nVisitor timezone: ${B.tz}\nVideo: ${data.meetUrl}\n${lines}\n\nDashboard: ${location.origin}/admin.html`
+            message: `[New booking: ${state.type.name}]\nWhen: ${new Date(data.start).toLocaleString("en-GB", { timeZone: state.ownerTz, dateStyle: "full", timeStyle: "short" })} (${state.ownerTz}), ${state.type.duration} min\nVisitor timezone: ${B.tz}${data.meetUrl ? `\nVideo: ${data.meetUrl}` : "\nSend them the video link"}\n${lines}\n\nDashboard: ${location.origin}/admin.html`
           }).catch(() => {});
         }
         return;

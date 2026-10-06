@@ -28,7 +28,7 @@
     if (state.view === "loading") {
       html = `<div class="bm__msg"><span class="typing"><i></i><i></i><i></i></span> Loading…</div>`;
     } else if (state.view === "missing") {
-      html = `<div class="bm__msg">This link isn't valid anymore.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> if you need to change your call.</div>`;
+      html = `<div class="bm__msg"><p>This link isn't valid anymore.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> if you need to change your call.</p></div>`;
     } else if (state.view === "view") {
       const status = b.status === "confirmed" ? (state.canChange ? "Confirmed" : "Done") : b.status === "cancelled" ? "Cancelled" : b.status.replace("_", " ");
       html = `
@@ -53,7 +53,7 @@
         <h1 class="mg__title" style="margin-top:0">Pick a new time</h1>
         <p class="muted" style="margin-bottom:22px">Currently ${esc(fmtLong(b.start))}, ${fmtTime(b.start)}.</p>
         ${state.notice ? `<p class="bm__notice" role="alert">${esc(state.notice)}</p>` : ""}
-        ${state.picker.slots.length ? B.pickerHtml(state.picker) : `<div class="bm__msg">No other open times right now. Email <a href="mailto:${EMAIL}">${EMAIL}</a>.</div>`}`;
+        ${state.picker.slots.length ? B.pickerHtml(state.picker) : `<div class="bm__msg"><p>No other open times right now. Email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p></div>`}`;
     } else if (state.view === "confirmMove") {
       const end = new Date(Date.parse(state.picker.slot) + b.duration * 60000).toISOString();
       html = `
