@@ -76,12 +76,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./styles.css?v=5" />
+  <link rel="stylesheet" href="./booking.css?v=9" />
   <link rel="stylesheet" href="./motion.css?v=6" />
   <link rel="stylesheet" href="./intro.css?v=8" />
   <link rel="stylesheet" href="./flair.css?v=8" />
-  <script src="./app.js?v=5" defer></script>
-  <script src="./chat.js?v=5" defer></script>
-  <script src="./booking.js?v=5" defer></script>
+  <script src="./app.js?v=9" defer></script>
+  <script src="./chat.js?v=9" defer></script>
+  <script src="./booking-core.js?v=9" defer></script>
+  <script src="./booking.js?v=9" defer></script>
   <script src="./motion.js?v=6" defer></script>
   <script src="./intro.js?v=8" defer></script>
   <script src="./vendor/lenis.min.js?v=1.3.26" defer></script>
@@ -432,14 +434,14 @@
         <div class="bm__avatar" role="img" aria-label="Ahmed Eldegla"></div>
         <div class="bm__who">
           <p class="bm__host">Ahmed Eldegla</p>
-          <h2 class="bm__title" id="bmTitle">Intro call</h2>
+          <h2 class="bm__title" id="bmTitle">Book a call</h2>
         </div>
         <ul class="bm__meta">
-          <li><svg width="18" height="18" class="ico"><use href="#i-clock"/></svg> 30 min</li>
-          <li><svg width="18" height="18" class="ico"><use href="#i-video"/></svg> Video call, link sent by email</li>
+          <li><svg width="18" height="18" class="ico"><use href="#i-clock"/></svg> <span id="bmDur">15–60 min</span></li>
+          <li><svg width="18" height="18" class="ico"><use href="#i-video"/></svg> Video link included</li>
           <li><svg width="18" height="18" class="ico"><use href="#i-globe"/></svg> <span id="bmTz">Your timezone</span></li>
         </ul>
-        <p class="bm__desc">Project scoping, hiring, or technical questions. Arabic or English.</p>
+        <p class="bm__desc" id="bmDesc">Pick the kind of call that fits. Arabic or English.</p>
       </aside>
       <div class="bm__main" id="bookingApp" aria-live="polite"></div>
     </div>

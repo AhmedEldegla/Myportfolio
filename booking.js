@@ -1,189 +1,193 @@
+// "Book a call" window: meeting type -> date & time -> details -> confirmation with the video link.
 (() => {
-  const API = ["localhost", "127.0.0.1"].includes(location.hostname)
-    ? "http://localhost:8787"
-    : "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev";
-  const EMAIL = "ahmeddagla99@gmail.com";
-
+  const B = window.AEBooking;
   const dialog = document.getElementById("bookModal");
   const root = document.getElementById("bookingApp");
-  if (!dialog || !root) return;
+  if (!B || !dialog || !root) return;
+  const { API, EMAIL, esc, fmtTime, fmtLong, icon } = B;
 
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "your timezone";
-  const tzLabel = document.getElementById("bmTz");
-  if (tzLabel) tzLabel.textContent = tz.replace(/_/g, " ");
+  const $info = {
+    title: document.getElementById("bmTitle"),
+    dur: document.getElementById("bmDur"),
+    desc: document.getElementById("bmDesc"),
+    tz: document.getElementById("bmTz")
+  };
+  if ($info.tz) $info.tz.textContent = B.tzLabel;
 
   const state = {
-    slots: [], slotMinutes: 30, ownerTz: "Africa/Cairo",
-    month: null, day: null, slot: null,
-    view: "loading", busy: false, notice: "", booked: null,
-    draft: { name: "", email: "", topic: "" }
+    view: "loading",            // loading | error | types | pick | form | done
+    config: null, type: null,
+    picker: { slots: [], month: null, day: null, slot: null },
+    ownerTz: "Africa/Cairo", notice: "", busy: false, booked: null,
+    draft: { name: "", email: "", answers: {} }
   };
 
-  // ---------- Helpers ----------
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const pad = (n) => String(n).padStart(2, "0");
-  const keyOf = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; // local date
-  const monthOf = (k) => k.slice(0, 7);
-  const fromKey = (k) => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
-  const fmtTime = (iso) => new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  const fmtLong = (iso) => new Date(iso).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
-  const icon = (id) => `<svg width="18" height="18" class="ico" aria-hidden="true"><use href="#${id}"/></svg>`;
-
-  function slotsByDay() {
-    const map = new Map();
-    for (const s of state.slots) {
-      const k = keyOf(new Date(s));
-      if (!map.has(k)) map.set(k, []);
-      map.get(k).push(s);
-    }
-    return map;
+  // ---------- Left panel follows the chosen meeting type ----------
+  function syncInfo() {
+    const t = state.type;
+    if ($info.title) $info.title.textContent = t ? t.name : "Book a call";
+    if ($info.dur) $info.dur.textContent = t ? `${t.duration} min` : "15–60 min";
+    if ($info.desc) $info.desc.textContent = t ? t.description : "Pick the kind of call that fits. Arabic or English.";
   }
 
-  function saveDraft() {
-    const f = root.querySelector("#bookForm");
-    if (f) state.draft = { name: f.elements.name.value, email: f.elements.email.value, topic: f.elements.topic.value };
+  function steps() {
+    const order = ["types", "pick", "form"];
+    const at = state.view === "done" ? 3 : order.indexOf(state.view);
+    if (at < 0) return "";
+    return `<ol class="bsteps" aria-label="Booking steps">${["Type", "Time", "Details"].map((s, i) =>
+      `<li class="${i < at ? "is-done" : i === at ? "is-on" : ""}"><span>${i < at ? "✓" : i + 1}</span>${s}</li>`).join("")}</ol>`;
   }
 
   // ---------- Views ----------
-  function render() {
-    saveDraft();
-    root.dataset.view = state.view;
-    if (state.view === "loading") {
-      root.innerHTML = `<div class="bm__msg"><span class="typing"><i></i><i></i><i></i></span> Loading available times…</div>`;
-    } else if (state.view === "error") {
-      root.innerHTML = `<div class="bm__msg">Online booking isn't available right now.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</div>`;
-    } else if (state.view === "pick") {
-      renderPick();
-    } else if (state.view === "form") {
-      renderForm();
-    } else if (state.view === "done") {
-      renderDone();
+  function saveDraft() {
+    const f = root.querySelector("#bookForm");
+    if (!f) return;
+    state.draft.name = f.elements.name.value;
+    state.draft.email = f.elements.email.value;
+    for (const q of state.type?.questions || []) {
+      const el = f.elements[`q_${q.id}`];
+      if (el) state.draft.answers[q.id] = el.value;
     }
   }
 
-  function renderPick() {
-    const days = slotsByDay();
-    if (!days.size) {
-      root.innerHTML = `<div class="bm__msg">No open times in the next two weeks.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</div>`;
-      return;
+  function render() {
+    saveDraft();
+    syncInfo();
+    root.dataset.view = state.view;
+    let html = "";
+    if (state.view === "loading") {
+      html = `<div class="bm__msg"><span class="typing"><i></i><i></i><i></i></span> Loading…</div>`;
+    } else if (state.view === "error") {
+      html = `<div class="bm__msg">Online booking isn't available right now.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</div>`;
+    } else if (state.view === "types") {
+      html = viewTypes();
+    } else if (state.view === "pick") {
+      html = viewPick();
+    } else if (state.view === "form") {
+      html = viewForm();
+    } else if (state.view === "done") {
+      html = viewDone();
     }
-    const keys = [...days.keys()];
-    const months = [...new Set(keys.map(monthOf))];
-    if (!state.day || !days.has(state.day)) state.day = keys[0];
-    if (!state.month || !months.includes(state.month)) state.month = monthOf(state.day);
+    root.innerHTML = `${steps()}<div class="bview">${html}</div>`;
+  }
 
-    const [y, m] = state.month.split("-").map(Number);
-    const first = new Date(y, m - 1, 1);
-    const lead = (first.getDay() + 6) % 7; // Monday-first grid
-    const count = new Date(y, m, 0).getDate();
-    const todayKey = keyOf(new Date());
-    const mi = months.indexOf(state.month);
-
-    let cells = "";
-    for (let i = 0; i < lead; i++) cells += `<span class="cal__pad"></span>`;
-    for (let d = 1; d <= count; d++) {
-      const k = `${state.month}-${pad(d)}`;
-      const avail = days.has(k);
-      const cls = ["cal__day", avail && "is-avail", k === state.day && "is-selected", k === todayKey && "is-today"].filter(Boolean).join(" ");
-      const label = fromKey(k).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
-      cells += avail
-        ? `<button type="button" class="${cls}" data-day="${k}" aria-pressed="${k === state.day}" aria-label="${label}, ${days.get(k).length} times available">${d}</button>`
-        : `<span class="${cls}" aria-hidden="true">${d}</span>`;
-    }
-
-    const times = days.get(state.day);
-    const dayTitle = fromKey(state.day).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
-
-    root.innerHTML = `
-      ${state.notice ? `<p class="bm__notice" role="alert">${esc(state.notice)}</p>` : ""}
-      <div class="bm__pick">
-        <div class="cal">
-          <div class="cal__head">
-            <h3 class="cal__month">${first.toLocaleDateString("en-GB", { month: "long" })} <span>${y}</span></h3>
-            <div class="cal__nav">
-              <button type="button" class="iconBtn" data-month="-1" aria-label="Previous month" ${mi <= 0 ? "disabled" : ""}><span class="flip">${icon("i-chev")}</span></button>
-              <button type="button" class="iconBtn" data-month="1" aria-label="Next month" ${mi >= months.length - 1 ? "disabled" : ""}>${icon("i-chev")}</button>
-            </div>
-          </div>
-          <div class="cal__dow" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-          <div class="cal__grid">${cells}</div>
-        </div>
-        <div class="times">
-          <p class="times__day">${dayTitle}</p>
-          <div class="times__list">
-            ${times.map((s) => `<button type="button" class="time" data-slot="${s}"><span class="time__dot"></span>${fmtTime(s)}</button>`).join("")}
-          </div>
-        </div>
+  function viewTypes() {
+    const types = state.config.types;
+    return `
+      <h3 class="bhead">What would you like to talk about?</h3>
+      <div class="btypes">
+        ${types.map((t, i) => `
+          <button type="button" class="btype" data-type="${esc(t.id)}" style="--i:${i}">
+            <span class="btype__dur">${t.duration}<small>min</small></span>
+            <span class="btype__body"><strong>${esc(t.name)}</strong><span>${esc(t.description)}</span></span>
+            <span class="btype__go">${icon("i-chev")}</span>
+          </button>`).join("")}
       </div>`;
   }
 
-  function renderForm() {
-    const end = new Date(Date.parse(state.slot) + state.slotMinutes * 60000).toISOString();
-    root.innerHTML = `
-      <button type="button" class="bm__back" data-back>${icon("i-back")} Back</button>
+  function viewPick() {
+    const back = state.config.types.length > 1 ? `<button type="button" class="bm__back" data-back="types">${icon("i-back")} Meeting type</button>` : "";
+    if (!state.picker.slots.length) {
+      return `${back}<div class="bm__msg">No open times in the next ${state.config.daysAhead} days.<br>Email <a href="mailto:${EMAIL}">${EMAIL}</a> and we'll find a time.</div>`;
+    }
+    return `${back}${state.notice ? `<p class="bm__notice" role="alert">${esc(state.notice)}</p>` : ""}${B.pickerHtml(state.picker)}`;
+  }
+
+  function question(q) {
+    const name = `q_${q.id}`;
+    const val = state.draft.answers[q.id] || "";
+    const label = `<span>${esc(q.label)}${q.required ? "" : " <em>(optional)</em>"}</span>`;
+    if (q.type === "textarea") return `<label class="field">${label}<textarea name="${name}" rows="3" maxlength="1500" ${q.required ? "required" : ""}>${esc(val)}</textarea></label>`;
+    if (q.type === "select") {
+      return `<label class="field">${label}<select name="${name}" ${q.required ? "required" : ""}>
+        <option value="">Choose…</option>${q.options.map((o) => `<option ${o === val ? "selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
+    }
+    return `<label class="field">${label}<input name="${name}" maxlength="200" value="${esc(val)}" ${q.required ? "required" : ""} /></label>`;
+  }
+
+  function viewForm() {
+    const slot = state.picker.slot;
+    const end = new Date(Date.parse(slot) + state.type.duration * 60000).toISOString();
+    return `
+      <button type="button" class="bm__back" data-back="pick">${icon("i-back")} Change time</button>
       <div class="bm__summary">
-        <p class="bm__summaryDate">${fmtLong(state.slot)}</p>
-        <p class="bm__summaryTime">${fmtTime(state.slot)} – ${fmtTime(end)} <span class="muted">· ${esc(tz.replace(/_/g, " "))}</span></p>
+        <span class="bm__summaryType">${esc(state.type.name)} · ${state.type.duration} min</span>
+        <p class="bm__summaryDate">${fmtLong(slot)}</p>
+        <p class="bm__summaryTime">${fmtTime(slot)} – ${fmtTime(end)} <span class="muted">· ${esc(B.tzLabel)}</span></p>
       </div>
       ${state.notice ? `<p class="bm__notice" role="alert">${esc(state.notice)}</p>` : ""}
       <form class="bm__form" id="bookForm" novalidate>
-        <label class="field"><span>Your name</span><input name="name" autocomplete="name" maxlength="100" required value="${esc(state.draft.name)}" /></label>
-        <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" maxlength="200" required value="${esc(state.draft.email)}" /></label>
-        <label class="field"><span>What would you like to discuss? <em>(optional)</em></span>
-          <textarea name="topic" rows="3" maxlength="500">${esc(state.draft.topic)}</textarea>
-        </label>
+        <div class="form__row">
+          <label class="field"><span>Your name</span><input name="name" autocomplete="name" maxlength="100" required value="${esc(state.draft.name)}" /></label>
+          <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" maxlength="200" required value="${esc(state.draft.email)}" /></label>
+        </div>
+        ${(state.type.questions || []).map(question).join("")}
         <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off" /></label>
         <button class="btn btn--accent btn--block" type="submit">Confirm booking</button>
+        <p class="bm__fine">You'll get a confirmation with the video link and a calendar invite.</p>
       </form>`;
-    if (!state.draft.name) root.querySelector('[name="name"]')?.focus();
   }
 
-  function calendarLinks(start, end) {
-    const stamp = (iso) => iso.replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-    const title = "Call with Ahmed Eldegla";
-    const details = `Ahmed will email you the video call link.\nQuestions: ${EMAIL}`;
-    const google = "https://calendar.google.com/calendar/render?action=TEMPLATE"
-      + `&text=${encodeURIComponent(title)}&dates=${stamp(start)}/${stamp(end)}&details=${encodeURIComponent(details)}`;
-    const ics = [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ahmedeldegla.com//booking//EN",
-      "BEGIN:VEVENT",
-      `UID:${stamp(start)}-${Math.random().toString(36).slice(2)}@ahmedeldegla.com`,
-      `DTSTAMP:${stamp(new Date().toISOString())}`,
-      `DTSTART:${stamp(start)}`, `DTEND:${stamp(end)}`,
-      `SUMMARY:${title}`, `DESCRIPTION:${details.replace(/\n/g, "\\n")}`,
-      "END:VEVENT", "END:VCALENDAR"
-    ].join("\r\n");
-    return { google, ics: "data:text/calendar;charset=utf-8," + encodeURIComponent(ics) };
-  }
-
-  function renderDone() {
+  function viewDone() {
     const b = state.booked;
-    const cal = calendarLinks(b.start, b.end);
-    root.innerHTML = `
+    const token = (b.manageUrl || "").split("t=")[1] || "";
+    const gcal = B.googleLink({
+      title: `${b.type.name} with Ahmed Eldegla`, start: b.start, end: b.end,
+      details: `Join: ${b.meetUrl}\nReschedule or cancel: ${b.manageUrl}`, location: b.meetUrl
+    });
+    return `
       <div class="bm__done">
-        <div class="bm__check" aria-hidden="true">✓</div>
+        <div class="bm__check" aria-hidden="true"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg></div>
         <h3>You're booked, ${esc(b.name.split(" ")[0])}!</h3>
-        <p class="bm__summaryDate">${fmtLong(b.start)}</p>
-        <p class="bm__summaryTime">${fmtTime(b.start)} – ${fmtTime(b.end)} <span class="muted">· ${esc(tz.replace(/_/g, " "))}</span></p>
-        <p class="muted">Ahmed will email the video call link to <strong>${esc(b.email)}</strong>. Need to change it? Email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+        <p class="muted">${esc(b.type.name)} · ${b.type.duration} min</p>
+        <div class="bm__when">
+          <p class="bm__summaryDate">${fmtLong(b.start)}</p>
+          <p class="bm__summaryTime">${fmtTime(b.start)} – ${fmtTime(b.end)} <span class="muted">· ${esc(B.tzLabel)}</span></p>
+        </div>
+        <div class="bm__link">
+          ${icon("i-video")}<a href="${esc(b.meetUrl)}" target="_blank" rel="noreferrer">${esc(b.meetUrl.replace(/^https:\/\//, ""))}</a>
+          <button type="button" class="iconBtn" data-copy="${esc(b.meetUrl)}" aria-label="Copy video link">${icon("i-copy")}</button>
+        </div>
+        <p class="muted bm__fine">${b.emailed
+          ? `A confirmation with the calendar invite is on its way to <strong>${esc(b.email)}</strong>.`
+          : "Save the video link above. You can also add the call to your calendar now."}</p>
         <div class="bm__cal">
-          <a class="btn btn--line btn--sm" href="${cal.google}" target="_blank" rel="noreferrer">Add to Google Calendar</a>
-          <a class="btn btn--line btn--sm" href="${cal.ics}" download="call-with-ahmed.ics">Download .ics</a>
+          <a class="btn btn--line btn--sm" href="${gcal}" target="_blank" rel="noreferrer">Google Calendar</a>
+          ${token ? `<a class="btn btn--line btn--sm" href="${API}/manage/ics?t=${token}">Apple / Outlook (.ics)</a>` : ""}
+          ${b.manageUrl ? `<a class="btn btn--line btn--sm" href="${esc(b.manageUrl)}" target="_blank" rel="noreferrer">Reschedule or cancel</a>` : ""}
         </div>
         <button type="button" class="btn btn--solid btn--sm" data-close>Done</button>
       </div>`;
   }
 
   // ---------- Data ----------
-  async function loadSlots(notice = "") {
-    if (!state.slots.length) { state.view = "loading"; render(); }
+  async function loadConfig() {
+    if (state.config) return true;
     try {
-      const res = await fetch(`${API}/slots`);
+      const res = await fetch(`${API}/booking/config`);
+      if (!res.ok) throw new Error(String(res.status));
+      state.config = await res.json();
+      state.ownerTz = state.config.timezone || state.ownerTz;
+      return state.config.types.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  async function chooseType(id) {
+    state.type = state.config.types.find((t) => t.id === id) || state.config.types[0];
+    state.picker = { slots: [], month: null, day: null, slot: null };
+    state.notice = "";
+    await loadSlots();
+  }
+
+  async function loadSlots(notice = "") {
+    if (!state.picker.slots.length) { state.view = "loading"; render(); }
+    try {
+      const res = await fetch(`${API}/slots?type=${encodeURIComponent(state.type.id)}`);
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
-      state.slots = data.slots || [];
-      state.slotMinutes = data.slotMinutes || 30;
-      state.ownerTz = data.timezone || state.ownerTz;
+      state.picker.slots = data.slots || [];
       state.notice = notice;
       state.view = "pick";
     } catch {
@@ -194,54 +198,66 @@
 
   async function submit(form) {
     if (state.busy) return;
+    saveDraft();
     const f = form.elements;
-    const name = f.name.value.trim();
-    const email = f.email.value.trim();
-    const topic = f.topic.value.trim();
+    const name = state.draft.name.trim();
+    const email = state.draft.email.trim();
     if (!name) return f.name.focus();
     if (!email || !f.email.checkValidity()) {
       state.notice = "Please enter a valid email address.";
       render();
       return root.querySelector('[name="email"]')?.focus();
     }
+    const answers = {};
+    for (const q of state.type.questions || []) {
+      const v = (state.draft.answers[q.id] || "").trim();
+      if (q.required && !v) {
+        state.notice = `Please answer: ${q.label}`;
+        render();
+        return root.querySelector(`[name="q_${q.id}"]`)?.focus();
+      }
+      if (v) answers[q.id] = v;
+    }
 
     state.busy = true;
     const btn = form.querySelector("button[type=submit]");
     btn.disabled = true;
     btn.textContent = "Booking…";
-
     try {
       const res = await fetch(`${API}/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ start: state.slot, name, email, topic, website: f.website.value })
+        body: JSON.stringify({ type: state.type.id, start: state.picker.slot, name, email, tz: B.tz, answers, website: f.website.value })
       });
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.ok) {
         state.booked = { ...data, name, email };
-        state.slots = state.slots.filter((s) => s !== state.slot);
-        state.slot = null;
+        state.picker.slots = state.picker.slots.filter((s) => s !== state.picker.slot);
         state.notice = "";
-        state.draft = { name: "", email: "", topic: "" };
+        state.draft = { name: "", email: "", answers: {} };
         state.view = "done";
         render();
-        // Email Ahmed as well (works even without Telegram set up)
-        window.AE_sendEmail?.({
-          name, email,
-          message: `[New call booking]\nWhen: ${new Date(data.start).toLocaleString("en-GB", { timeZone: state.ownerTz, dateStyle: "full", timeStyle: "short" })} (${state.ownerTz}), ${state.slotMinutes} min\nVisitor timezone: ${tz}\nTopic: ${topic || "-"}\n\nSend the meeting link from ${location.origin}/admin.html`
-        }).catch(() => {});
+        window.AE_track?.("book_done", state.type.id);
+        // Until the server sends its own emails, let Ahmed know through EmailJS
+        if (!data.emailed) {
+          const lines = (state.type.questions || []).filter((q) => answers[q.id]).map((q) => `${q.label}: ${answers[q.id]}`).join("\n");
+          window.AE_sendEmail?.({
+            name, email,
+            message: `[New booking: ${state.type.name}]\nWhen: ${new Date(data.start).toLocaleString("en-GB", { timeZone: state.ownerTz, dateStyle: "full", timeStyle: "short" })} (${state.ownerTz}), ${state.type.duration} min\nVisitor timezone: ${B.tz}\nVideo: ${data.meetUrl}\n${lines}\n\nDashboard: ${location.origin}/admin.html`
+          }).catch(() => {});
+        }
         return;
       }
       if (data.error === "slot_unavailable") {
-        state.slot = null;
-        state.view = "pick";
-        saveDraft();
+        state.picker.slot = null;
+        state.picker.slots = [];
         return loadSlots("Sorry, that time was just taken. Please pick another.");
       }
       state.notice = {
         email_invalid: "Please enter a valid email address.",
-        too_many_bookings: "You already have upcoming calls booked. Email Ahmed to change them.",
+        answer_required: "Please answer the required questions.",
+        too_many_bookings: "You already have upcoming calls booked. Use the link in your confirmation email to change them.",
         rate_limited: "Too many attempts. Please try again later."
       }[data.error] || "Something went wrong. Please try again.";
       render();
@@ -254,21 +270,26 @@
   }
 
   // ---------- Open / close ----------
-  function open() {
+  async function open() {
     if (dialog.open) return;
     document.dispatchEvent(new CustomEvent("ae:booking-open"));
-    if (state.view === "done") { state.view = "pick"; state.notice = ""; }
+    window.AE_track?.("book_open");
     document.documentElement.classList.add("modal-open");
     dialog.showModal();
-    loadSlots(); // always refresh, so taken times disappear
+    if (state.view === "done") { state.view = "types"; state.type = null; }
+    state.notice = "";
+    if (!(await loadConfig())) { state.view = "error"; return render(); }
+    if (state.config.types.length === 1) return chooseType(state.config.types[0].id);
+    if (state.type && state.view !== "types") return loadSlots(); // refresh, so taken times disappear
+    state.view = "types";
+    render();
   }
-  // Unlock page scroll right away; the dialog's own "close" event can arrive late
   const unlock = () => document.documentElement.classList.remove("modal-open");
   function close() {
     unlock();
     if (dialog.open) dialog.close();
   }
-  dialog.addEventListener("cancel", unlock); // Esc key
+  dialog.addEventListener("cancel", unlock);
   dialog.addEventListener("close", unlock);
 
   // Any "Book a call" trigger on the page (buttons, #book links, links from the AI chat)
@@ -279,45 +300,34 @@
     open();
   }, true);
 
-  // Click on the dark backdrop closes
   dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) close();
-  });
-
-  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) return close();
     if (e.target.closest("[data-close]")) return close();
 
-    const day = e.target.closest("[data-day]");
-    if (day) {
-      state.day = day.dataset.day;
-      state.notice = "";
-      render();
-      root.querySelector(".times")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    const type = e.target.closest("[data-type]");
+    if (type) return chooseType(type.dataset.type);
+
+    const copy = e.target.closest("[data-copy]");
+    if (copy) {
+      navigator.clipboard?.writeText(copy.dataset.copy).then(() => {
+        copy.classList.add("is-copied");
+        setTimeout(() => copy.classList.remove("is-copied"), 1400);
+      }).catch(() => {});
       return;
     }
-    const nav = e.target.closest("[data-month]");
-    if (nav) {
-      const months = [...new Set([...slotsByDay().keys()].map(monthOf))];
-      const i = months.indexOf(state.month) + Number(nav.dataset.month);
-      if (months[i]) {
-        state.month = months[i];
-        state.day = [...slotsByDay().keys()].find((k) => monthOf(k) === state.month);
-        render();
-      }
-      return;
-    }
-    const time = e.target.closest("[data-slot]");
-    if (time) {
-      state.slot = time.dataset.slot;
+
+    const back = e.target.closest("[data-back]");
+    if (back) {
+      state.view = back.dataset.back;
       state.notice = "";
-      state.view = "form";
-      render();
-      return;
+      if (state.view === "types") state.type = null;
+      return render();
     }
-    if (e.target.closest("[data-back]")) {
-      state.view = "pick";
-      state.notice = "";
-      render();
+
+    if (state.view === "pick") {
+      const r = B.pickerClick(e, state.picker);
+      if (r === "slot") { state.notice = ""; state.view = "form"; render(); root.querySelector('[name="name"]')?.focus(); }
+      else if (r === "render") { state.notice = ""; render(); root.querySelector(".times")?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
     }
   });
 
@@ -328,5 +338,11 @@
   });
 
   // Deep link: ahmedeldegla.com/#book opens the booking window
-  if (location.hash === "#book") open();
+  if (location.hash === "#book") {
+    if (document.documentElement.classList.contains("intro-on")) {
+      document.addEventListener("ae:reveal", () => setTimeout(open, 900), { once: true });
+    } else {
+      open();
+    }
+  }
 })();

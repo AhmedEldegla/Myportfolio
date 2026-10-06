@@ -1,4 +1,5 @@
-// Your availability for calls. Edit, then `npx wrangler deploy`.
+// Starting availability, used until you first save the Availability page in the dashboard
+// (admin.html). After that, the dashboard's settings take over; no redeploy needed.
 // Times are in TIMEZONE; visitors see them converted to their own timezone.
 
 export const TIMEZONE = "Africa/Cairo";

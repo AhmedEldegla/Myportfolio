@@ -53,6 +53,60 @@
     ]
   };
 
+  // Backend (Cloudflare Worker): bookings, inbox, AI assistant, analytics
+  const API = ["localhost", "127.0.0.1"].includes(location.hostname)
+    ? "http://localhost:8787"
+    : "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev";
+  window.AE_API = API;
+
+  // Privacy-friendly analytics: an anonymous random id, no cookies, no IP stored
+  let visitor = "";
+  try {
+    visitor = localStorage.getItem("ae_vid") || "";
+    if (!visitor) {
+      visitor = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem("ae_vid", visitor);
+    }
+  } catch {}
+  const device = () => (innerWidth < 640 ? "mobile" : innerWidth < 1024 ? "tablet" : "desktop");
+  function track(type, name = "") {
+    const body = JSON.stringify({ type, name, path: location.pathname, ref: document.referrer, vid: visitor, device: device() });
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(API + "/track", new Blob([body], { type: "text/plain" }))) return;
+    } catch {}
+    fetch(API + "/track", { method: "POST", body, keepalive: true }).catch(() => {});
+  }
+  window.AE_track = track;
+
+  // Saves a message to Ahmed's inbox. Resolves with { ok, emailed } or rejects.
+  window.AE_postContact = async (payload) => {
+    const res = await fetch(API + "/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    return res.json();
+  };
+
+  function initAnalytics() {
+    track("pageview");
+    if (!("IntersectionObserver" in window)) return;
+    const seen = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting || seen.has(e.target.id)) return;
+        seen.add(e.target.id);
+        io.unobserve(e.target);
+        track("section", e.target.id);
+      });
+    }, { threshold: 0.35 });
+    ["about", "experience", "projects", "skills", "contact"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+  }
+
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -274,18 +328,22 @@
         return;
       }
 
-      if (!isConfigured || !window.emailjs) {
-        openMailto(name, email, message);
-        return;
-      }
-
       const btn = form.querySelector("button[type='submit']");
       const original = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Sending…";
 
       try {
-        await sendEmail({ name, email, message });
+        // Saved to Ahmed's inbox first; EmailJS covers the email until the server sends its own
+        const saved = await window.AE_postContact({ name, email, message }).catch(() => null);
+        if (!saved || !saved.emailed) {
+          if (!isConfigured || !window.emailjs) {
+            if (!saved) throw new Error("no_channel");
+          } else {
+            await sendEmail({ name, email, message }).catch((err) => { if (!saved) throw err; });
+          }
+        }
+        track("contact");
         toast("Thanks, your message was sent");
         form.reset();
       } catch (err) {
@@ -307,6 +365,7 @@
     initActiveNav();
     initReveal();
     initContact();
+    initAnalytics();
   }
 
   document.addEventListener("DOMContentLoaded", boot);
