@@ -56,13 +56,11 @@
         if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
-      // Hold the page behind the intro (intro.js lifts it). First visit in a session gets the
-      // full intro; deep links and repeat visits skip straight to the hero. Never stuck past 9s.
+      // Hold the page behind the intro (intro.js lifts it). It plays on every visit,
+      // including links to a section. Never stuck past 9s.
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        var html = document.documentElement, seen = false;
-        try { seen = sessionStorage.getItem("ae_intro") === "1"; } catch (e) {}
-        html.classList.add("is-loading");
-        if (!seen && !location.hash) html.classList.add("intro-on");
+        var html = document.documentElement;
+        html.classList.add("is-loading", "intro-on");
         setTimeout(function () {
           if (!html.classList.contains("is-loading") && !html.classList.contains("intro-on")) return;
           html.classList.remove("is-loading", "intro-on", "intro-flip");
@@ -79,13 +77,13 @@
 
   <link rel="stylesheet" href="./styles.css?v=5" />
   <link rel="stylesheet" href="./motion.css?v=6" />
-  <link rel="stylesheet" href="./intro.css?v=6" />
+  <link rel="stylesheet" href="./intro.css?v=8" />
   <link rel="stylesheet" href="./flair.css?v=7" />
   <script src="./app.js?v=5" defer></script>
   <script src="./chat.js?v=5" defer></script>
   <script src="./booking.js?v=5" defer></script>
   <script src="./motion.js?v=6" defer></script>
-  <script src="./intro.js?v=6" defer></script>
+  <script src="./intro.js?v=8" defer></script>
   <script src="./flair.js?v=7" defer></script>
 </head>
 
