@@ -54,15 +54,13 @@
       const title = $(".section__title", head);
       if (title) splitWords(title);
     });
-    $$(".about__big.reveal, .contact__big, .ctaBand__title").forEach((el) => {
+    $$(".contact__big, .ctaBand__title").forEach((el) => {
       splitWords(el);
       el.style.setProperty("--wd", "100ms");
       el.querySelectorAll(".w__i").forEach((w) => {
         w.style.transitionDelay = `calc(var(--i) * 18ms + var(--wd))`;
       });
     });
-    // Titles inside a .reveal parent animate when that parent shows
-    $$(".about__big.reveal").forEach((el) => el.classList.add("is-split"));
   }
 
   // Hero stagger after the loader + grid/list stagger elsewhere
