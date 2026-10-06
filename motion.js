@@ -5,44 +5,6 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  // Intro loader: count to 100, then wipe up and let the hero play in
-  function initLoader() {
-    const loader = $("#loader");
-    if (!root.classList.contains("is-loading") || !loader) {
-      root.classList.remove("is-loading");
-      return;
-    }
-    const bar = $(".loader__bar i", loader);
-    const count = $(".loader__count", loader);
-    const MIN = 1500;
-    const start = performance.now();
-    let loaded = document.readyState === "complete";
-    window.addEventListener("load", () => { loaded = true; }, { once: true });
-
-    const tick = (now) => {
-      const t = Math.min((now - start) / MIN, 1);
-      // Ease out, and hold at 90% until the page has actually loaded
-      let p = 1 - Math.pow(1 - t, 3);
-      if (!loaded) p = Math.min(p, 0.9);
-      bar.style.setProperty("--p", p.toFixed(3));
-      count.textContent = String(Math.round(p * 100)).padStart(3, "0");
-      if (p < 1) return requestAnimationFrame(tick);
-      setTimeout(finish, 180);
-    };
-    requestAnimationFrame(tick);
-    // Never trap the visitor behind the loader
-    setTimeout(() => { loaded = true; }, 3500);
-
-    function finish() {
-      root.classList.add("loader-exit");
-      root.classList.remove("is-loading");
-      setTimeout(() => {
-        root.classList.remove("loader-exit");
-        loader.remove();
-      }, 1100);
-    }
-  }
-
   // Wrap each word in a mask so it can slide up into place
   function splitWords(el) {
     const frag = document.createDocumentFragment();
@@ -133,6 +95,11 @@
   }
 
   // Count numbers up when they come into view
+  function afterIntro(delay, fn) {
+    if (!root.classList.contains("is-loading")) return setTimeout(fn, delay);
+    document.addEventListener("ae:reveal", () => setTimeout(fn, delay), { once: true });
+  }
+
   function initCounters() {
     const els = $$(".fact dd, .pstats dd").filter((el) => /^\d+/.test(el.textContent.trim()));
     const io = new IntersectionObserver((entries) => {
@@ -142,11 +109,10 @@
         const el = e.target;
         const [, num, rest] = el.textContent.trim().match(/^(\d+)(.*)$/);
         const target = Number(num);
-        // Wait for the hero to finish playing in if the intro is still running
-        const delay = root.classList.contains("is-loading") ? 2400 : 250;
         const dur = 1400;
         el.textContent = "0" + rest;
-        setTimeout(() => {
+        // While the intro is up, wait for it to hand over to the page
+        afterIntro(root.classList.contains("is-loading") ? 1200 : 250, () => {
           const t0 = performance.now();
           const step = (now) => {
             const t = Math.min((now - t0) / dur, 1);
@@ -154,7 +120,7 @@
             if (t < 1) requestAnimationFrame(step);
           };
           requestAnimationFrame(step);
-        }, delay);
+        });
       });
     }, { threshold: 0.4 });
     els.forEach((el) => io.observe(el));
@@ -355,7 +321,6 @@
       return;
     }
     initStagger();
-    initLoader();
     initCounters();
     initScramble();
     initScroll();
