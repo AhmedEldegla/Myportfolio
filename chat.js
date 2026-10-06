@@ -17,15 +17,18 @@
   let messages = [];      // { role: "user" | "assistant", text }
   let leadSent = false;
   let busy = false;
+  // Anonymous conversation id, so Ahmed can read the conversation in his dashboard
+  let sid = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
   try {
     const saved = JSON.parse(sessionStorage.getItem(STORE_KEY) || "null");
     if (saved && Array.isArray(saved.messages)) {
       messages = saved.messages;
       leadSent = Boolean(saved.leadSent);
+      if (/^[a-z0-9]{8,40}$/.test(saved.sid || "")) sid = saved.sid;
     }
   } catch {}
   const save = () => {
-    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ messages, leadSent })); } catch {}
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ messages, leadSent, sid })); } catch {}
   };
 
   // ---------- Rendering helpers ----------
@@ -125,6 +128,7 @@
   }
 
   function setOpen(open) {
+    if (open && panel.hidden) window.AE_track?.("chat_open");
     panel.hidden = !open;
     launch.setAttribute("aria-expanded", String(open));
     root.classList.toggle("is-open", open);
@@ -154,12 +158,17 @@
     const transcript = messages
       .map((x) => `${x.role === "user" ? "Visitor" : "Assistant"}: ${visible(x.text)}`)
       .join("\n\n");
+    const payload = {
+      name: String(lead.name || "Portfolio visitor").slice(0, 120),
+      email: lead.email,
+      message: `[Via AI assistant]\nNeed: ${lead.need || "-"}\n\n--- Conversation ---\n${transcript}`.slice(0, 5000)
+    };
     try {
-      await window.AE_sendEmail({
-        name: String(lead.name || "Portfolio visitor").slice(0, 120),
-        email: lead.email,
-        message: `[Via AI assistant]\nNeed: ${lead.need || "-"}\n\n--- Conversation ---\n${transcript}`.slice(0, 8000)
-      });
+      // Save to Ahmed's inbox; also email through EmailJS when the server can't send email yet
+      const saved = await window.AE_postContact?.({ ...payload, kind: "lead" }).catch(() => null);
+      if (!saved || !saved.emailed) {
+        try { await window.AE_sendEmail(payload); } catch (err) { if (!saved) throw err; }
+      }
       leadSent = true;
       save();
       note("Your details were sent to Ahmed.");
@@ -190,7 +199,7 @@
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages })
+        body: JSON.stringify({ messages, sid })
       });
 
       if (!res.ok || !res.body) {

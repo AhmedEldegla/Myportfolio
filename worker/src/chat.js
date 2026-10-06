@@ -66,13 +66,45 @@ function cleanMessages(input) {
   }));
 }
 
-export async function handleChat(request, env, headers, ip) {
+// Pull the text out of Gemini's SSE stream so the conversation can be saved
+async function collectText(stream) {
+  const reader = stream.getReader();
+  const dec = new TextDecoder();
+  let buf = "", text = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith("data:")) continue;
+      try {
+        const data = JSON.parse(line.slice(5));
+        for (const p of data.candidates?.[0]?.content?.parts || []) text += p.text || "";
+      } catch {}
+    }
+  }
+  return text;
+}
+
+async function logTurn(env, sid, role, content) {
+  if (!env.DB || !sid || !content) return;
+  await env.DB
+    .prepare("INSERT INTO chat_messages (session_id, role, content, created_at) VALUES (?1, ?2, ?3, ?4)")
+    .bind(sid, role, content.slice(0, 4000), new Date().toISOString())
+    .run()
+    .catch((err) => console.error("chat log failed", err));
+}
+
+export async function handleChat(request, env, ctx, headers, ip) {
   if (!env.GEMINI_API_KEY) return json(500, { error: "not_configured" }, headers);
   if (limited(ip)) return json(429, { error: "rate_limited" }, headers);
 
   const body = await readJson(request);
   const contents = cleanMessages(body && body.messages);
   if (!contents) return json(400, { error: "bad_messages" }, headers);
+  const sid = typeof body.sid === "string" && /^[a-z0-9]{8,40}$/.test(body.sid) ? body.sid : "";
 
   const base = env.GEMINI_BASE || "https://generativelanguage.googleapis.com";
   const model = env.GEMINI_MODEL || "gemini-3.5-flash-lite";
@@ -101,8 +133,19 @@ export async function handleChat(request, env, headers, ip) {
     return json(status, { error: status === 429 ? "quota" : "upstream" }, headers);
   }
 
-  // Stream Gemini's SSE straight through to the browser
-  return new Response(upstream.body, {
+  // Stream Gemini's SSE straight through to the browser, keeping a copy for the admin chat log
+  let out = upstream.body;
+  if (sid && env.DB) {
+    const [toClient, toLog] = upstream.body.tee();
+    out = toClient;
+    const question = contents[contents.length - 1].parts[0].text;
+    ctx.waitUntil((async () => {
+      await logTurn(env, sid, "user", question);
+      const answer = (await collectText(toLog)).replace(/\[\[LEAD\]\][\s\S]*$/, "").trim();
+      await logTurn(env, sid, "assistant", answer);
+    })());
+  }
+  return new Response(out, {
     headers: { ...headers, "Content-Type": "text/event-stream", "Cache-Control": "no-store" }
   });
 }

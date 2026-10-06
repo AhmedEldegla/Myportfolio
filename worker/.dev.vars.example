@@ -1,0 +1,9 @@
+# Copy to .dev.vars for `npm run dev`. Never commit .dev.vars.
+ADMIN_PASSWORD=change-me
+# GEMINI_API_KEY=
+# RESEND_API_KEY=
+# GOOGLE_CLIENT_ID=
+# GOOGLE_CLIENT_SECRET=
+# GOOGLE_REFRESH_TOKEN=
+# TELEGRAM_BOT_TOKEN=
+# TELEGRAM_CHAT_ID=

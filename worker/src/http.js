@@ -5,7 +5,7 @@ export function corsHeaders(origin, env) {
     ok,
     headers: {
       "Access-Control-Allow-Origin": ok ? origin : allowed[0] || "",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Max-Age": "86400",
       "Vary": "Origin"
