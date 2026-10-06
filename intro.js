@@ -18,7 +18,12 @@
       return;
     }
 
-    try { history.scrollRestoration = "manual"; } catch {}
+    // Start at the top; a section link (#projects) is honoured once the intro is done
+    const hash = location.hash;
+    try {
+      history.scrollRestoration = "manual";
+      if (hash) history.replaceState(null, "", location.pathname + location.search);
+    } catch {}
     window.scrollTo(0, 0);
 
     // Hold the page still while the intro plays (no overflow lock, so nothing shifts on hand-off)
@@ -140,7 +145,12 @@
       portrait?.classList.add("no-anim");
       root.classList.remove("intro-flip", "intro-on");
       intro.remove();
-      try { sessionStorage.setItem("ae_intro", "1"); } catch {}
+      if (hash) {
+        try { history.replaceState(null, "", hash); } catch {}
+        let target = null;
+        try { target = document.querySelector(hash); } catch {}
+        if (target) setTimeout(() => target.scrollIntoView({ behavior: "smooth" }), 700);
+      }
       reveal();
       requestAnimationFrame(() => requestAnimationFrame(() => portrait?.classList.remove("no-anim")));
     }
