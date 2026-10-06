@@ -56,11 +56,18 @@
         if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
-      // Hold the page behind the intro loader (motion.js lifts it); never longer than 6s
+      // Hold the page behind the intro (intro.js lifts it). First visit in a session gets the
+      // full intro; deep links and repeat visits skip straight to the hero. Never stuck past 9s.
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        var html = document.documentElement;
+        var html = document.documentElement, seen = false;
+        try { seen = sessionStorage.getItem("ae_intro") === "1"; } catch (e) {}
         html.classList.add("is-loading");
-        setTimeout(function () { html.classList.remove("is-loading"); }, 6000);
+        if (!seen && !location.hash) html.classList.add("intro-on");
+        setTimeout(function () {
+          if (!html.classList.contains("is-loading") && !html.classList.contains("intro-on")) return;
+          html.classList.remove("is-loading", "intro-on", "intro-flip");
+          document.dispatchEvent(new Event("ae:reveal"));
+        }, 9000);
       }
     })();
   </script>
@@ -71,24 +78,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./styles.css?v=5" />
-  <link rel="stylesheet" href="./motion.css?v=5" />
+  <link rel="stylesheet" href="./motion.css?v=6" />
+  <link rel="stylesheet" href="./intro.css?v=6" />
   <script src="./app.js?v=5" defer></script>
   <script src="./chat.js?v=5" defer></script>
   <script src="./booking.js?v=5" defer></script>
-  <script src="./motion.js?v=5" defer></script>
+  <script src="./motion.js?v=6" defer></script>
+  <script src="./intro.js?v=6" defer></script>
 </head>
 
 <body>
-  <!-- Intro loader -->
-  <div class="loader" id="loader" aria-hidden="true">
-    <div class="loader__inner">
-      <span class="loader__mark">AE</span>
-      <span class="loader__name"><span>Ahmed Eldegla</span></span>
-      <span class="loader__bar"><i></i></span>
-      <span class="loader__count">000</span>
+  <!-- Intro: greeting, name + portrait, then the curtain lifts and the photo flies into the hero -->
+  <div class="intro" id="intro">
+    <div class="intro__cols intro__cols--accent" aria-hidden="true"><i style="--c:0"></i><i style="--c:1"></i><i style="--c:2"></i><i style="--c:3"></i><i style="--c:4"></i></div>
+    <div class="intro__cols" aria-hidden="true"><i style="--c:0"></i><i style="--c:1"></i><i style="--c:2"></i><i style="--c:3"></i><i style="--c:4"></i></div>
+    <div class="intro__hud" aria-hidden="true">
+      <span class="intro__tl">AE<i></i>Portfolio</span>
+      <span class="intro__tr">Backend · .NET · C++</span>
+      <span class="intro__bl">Mansoura, Egypt<br />31.04°N 31.38°E</span>
+      <span class="intro__count" id="introCount">000</span>
     </div>
+    <p class="intro__hello" aria-hidden="true"><span id="introWord">Hello</span></p>
+    <div class="intro__stage" aria-hidden="true">
+      <p class="intro__name"><span class="intro__word"><span class="intro__ch" style="--i:0">A</span><span class="intro__ch" style="--i:1">h</span><span class="intro__ch" style="--i:2">m</span><span class="intro__ch" style="--i:3">e</span><span class="intro__ch" style="--i:4">d</span></span> <span class="intro__word"><span class="intro__ch" style="--i:5">E</span><span class="intro__ch" style="--i:6">l</span><span class="intro__ch" style="--i:7">d</span><span class="intro__ch" style="--i:8">e</span><span class="intro__ch" style="--i:9">g</span><span class="intro__ch" style="--i:10">l</span><span class="intro__ch" style="--i:11">a</span></span></p>
+      <div class="intro__card" id="introCard"><div class="intro__photo"><img src="./assets/profile.jpg" alt="" /></div></div>
+    </div>
+    <p class="intro__role" id="introRole" aria-hidden="true">Backend Developer — .NET &amp; C++</p>
+    <button class="intro__skip" type="button" id="introSkip">Skip intro</button>
   </div>
-
   <!-- Ambient background -->
   <div class="bgfx" aria-hidden="true">
     <span class="bgfx__blob bgfx__blob--a"></span>
