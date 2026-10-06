@@ -56,6 +56,12 @@
         if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
+      // Hold the page behind the intro loader (motion.js lifts it); never longer than 6s
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var html = document.documentElement;
+        html.classList.add("is-loading");
+        setTimeout(function () { html.classList.remove("is-loading"); }, 6000);
+      }
     })();
   </script>
 
@@ -64,13 +70,35 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./styles.css?v=4" />
-  <script src="./app.js?v=4" defer></script>
-  <script src="./chat.js?v=4" defer></script>
-  <script src="./booking.js?v=4" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=5" />
+  <link rel="stylesheet" href="./motion.css?v=5" />
+  <script src="./app.js?v=5" defer></script>
+  <script src="./chat.js?v=5" defer></script>
+  <script src="./booking.js?v=5" defer></script>
+  <script src="./motion.js?v=5" defer></script>
 </head>
 
 <body>
+  <!-- Intro loader -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <span class="loader__mark">AE</span>
+      <span class="loader__name"><span>Ahmed Eldegla</span></span>
+      <span class="loader__bar"><i></i></span>
+      <span class="loader__count">000</span>
+    </div>
+  </div>
+
+  <!-- Ambient background -->
+  <div class="bgfx" aria-hidden="true">
+    <span class="bgfx__blob bgfx__blob--a"></span>
+    <span class="bgfx__blob bgfx__blob--b"></span>
+    <span class="bgfx__blob bgfx__blob--c"></span>
+    <span class="bgfx__grid"></span>
+    <span class="bgfx__spot"></span>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="progress" aria-hidden="true"></div>
   <!-- Inline icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></symbol>
@@ -199,6 +227,14 @@
         </div>
       </dl>
     </section>
+
+    <!-- Tech marquee -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <div class="marquee__group"><span class="marquee__item">ASP.NET Core</span><span class="marquee__star">✦</span><span class="marquee__item">Clean Architecture</span><span class="marquee__star">✦</span><span class="marquee__item">CQRS</span><span class="marquee__star">✦</span><span class="marquee__item">EF Core</span><span class="marquee__star">✦</span><span class="marquee__item">SQL Server</span><span class="marquee__star">✦</span><span class="marquee__item">C++</span><span class="marquee__star">✦</span><span class="marquee__item">Real-time networking</span><span class="marquee__star">✦</span><span class="marquee__item">JWT &amp; Identity</span><span class="marquee__star">✦</span><span class="marquee__item">MediatR</span><span class="marquee__star">✦</span><span class="marquee__item">REST APIs</span><span class="marquee__star">✦</span></div>
+        <div class="marquee__group"><span class="marquee__item">ASP.NET Core</span><span class="marquee__star">✦</span><span class="marquee__item">Clean Architecture</span><span class="marquee__star">✦</span><span class="marquee__item">CQRS</span><span class="marquee__star">✦</span><span class="marquee__item">EF Core</span><span class="marquee__star">✦</span><span class="marquee__item">SQL Server</span><span class="marquee__star">✦</span><span class="marquee__item">C++</span><span class="marquee__star">✦</span><span class="marquee__item">Real-time networking</span><span class="marquee__star">✦</span><span class="marquee__item">JWT &amp; Identity</span><span class="marquee__star">✦</span><span class="marquee__item">MediatR</span><span class="marquee__star">✦</span><span class="marquee__item">REST APIs</span><span class="marquee__star">✦</span></div>
+      </div>
+    </div>
 
     <!-- ABOUT -->
     <section id="about" class="section container">

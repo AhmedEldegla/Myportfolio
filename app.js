@@ -80,9 +80,22 @@
   }
   function initTheme() {
     setTheme(document.documentElement.getAttribute("data-theme") || "dark");
-    $("#themeToggle")?.addEventListener("click", () => {
+    $("#themeToggle")?.addEventListener("click", (e) => {
       const curr = document.documentElement.getAttribute("data-theme");
-      setTheme(curr === "dark" ? "light" : "dark");
+      const next = curr === "dark" ? "light" : "dark";
+      if (reduceMotion || !document.startViewTransition) return setTheme(next);
+
+      // Circular reveal of the new theme, growing out of the toggle button
+      const r = e.currentTarget.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      document.startViewTransition(() => setTheme(next)).ready.then(() => {
+        document.documentElement.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+          { duration: 700, easing: "cubic-bezier(.76,0,.24,1)", pseudoElement: "::view-transition-new(root)" }
+        );
+      });
     });
   }
 
