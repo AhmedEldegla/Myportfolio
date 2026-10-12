@@ -1,0 +1,53 @@
+name: Build and deploy the website
+
+# Runs on every push, and when the dashboard's Publish button (or auto-publish) asks for a rebuild
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [publish-content]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Bakes the latest CMS content into index.html (keeps the committed content if the API is unreachable)
+      - name: Bake content from the API
+        env:
+          API_URL: ${{ vars.API_URL }}
+        run: node scripts/build-content.mjs
+
+      - name: Collect the site
+        run: |
+          mkdir _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'worker' --exclude 'scripts' --exclude '_site' ./ _site/
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

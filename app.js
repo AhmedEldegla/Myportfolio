@@ -1,63 +1,9 @@
 (() => {
-  const PROFILE = {
-    email: "ahmeddagla99@gmail.com",
-    projects: [
-      {
-        title: "DEPI Smart Freelance Platform",
-        kind: "Backend API · Team of 5 · 2026",
-        featured: true,
-        desc: "The backend of a freelance marketplace: projects, proposals, milestone contracts, escrow wallets, messaging, reviews, guilds and communities. I was the team's top contributor and repository owner.",
-        stats: [["17", "controllers"], ["4", "Clean Architecture layers"], ["5", "developers"]],
-        bullets: [
-          "Structured the solution in 4 layers (Domain, Application, Infrastructure, API) with Clean Architecture and CQRS via MediatR.",
-          "Implemented authentication and authorization with ASP.NET Core Identity and JWT, including role/permission management and user sessions.",
-          "Designed the SQL Server data model with EF Core, fixed shadow foreign-key mapping issues, and delivered SQL scripts and backups for the data analysis team.",
-          "Added global exception-handling middleware, MediatR logging behaviors, request validation, rate limiting, health checks, and GitHub Actions workflows."
-        ],
-        stack: ["ASP.NET Core 8", "EF Core", "SQL Server", "MediatR", "JWT", "Identity", "AutoMapper", "FluentValidation", "Swagger"],
-        live: "",
-        github: "https://github.com/AhmedEldegla/Depi"
-      },
-      {
-        title: "Mo7amek",
-        kind: "Legal practice management",
-        desc: "A management system for law offices that organizes cases, clients, appointments, and day-to-day office workflows.",
-        stack: [".NET API", "SQL Server"],
-        live: "",
-        github: ""
-      },
-      {
-        title: "Cashier POS System",
-        kind: "Point of sale",
-        desc: "Point-of-sale backend for cashier workflows: sales operations, transactions, and business data management.",
-        stack: [".NET API", "SQL Server"],
-        live: "",
-        github: ""
-      },
-      {
-        title: "Smart Accountant",
-        kind: "Dashboard",
-        desc: "A dashboard for accounting workflows that gives business owners a clear view of their numbers.",
-        stack: ["Web", "Dashboard"],
-        live: "",
-        github: ""
-      }
-    ],
-    skills: [
-      { group: "Backend", items: ["C#", "ASP.NET Core Web API (.NET 8)", "RESTful APIs", "Entity Framework Core", "LINQ", "MediatR", "AutoMapper", "FluentValidation"] },
-      { group: "Architecture", items: ["Clean Architecture", "CQRS", "Repository Pattern", "Result Pattern", "Domain Events", "Dependency Injection", "SOLID · OOP"] },
-      { group: "Security", items: ["JWT Authentication", "ASP.NET Core Identity", "Role & permission-based authorization", "Rate limiting"] },
-      { group: "Databases", items: ["SQL Server", "T-SQL", "EF Core Migrations", "Database design & relationships"] },
-      { group: "Systems", items: ["C++", "Multithreading", "Data structures & algorithms", "Real-time networking", "Debugging", "Performance optimization"] },
-      { group: "Tools", items: ["Git & GitHub", "GitHub Actions", "Swagger / OpenAPI", "Visual Studio", "SSMS"] }
-    ]
-  };
+  // Site content (projects, skills, text) is baked into index.html from the CMS; see cms.js
+  const EMAIL = () => document.querySelector(".emailRow__addr")?.textContent.trim() || "ahmeddagla99@gmail.com";
 
-  // Backend (Cloudflare Worker): bookings, inbox, AI assistant, analytics
-  const API = ["localhost", "127.0.0.1"].includes(location.hostname)
-    ? "http://localhost:8787"
-    : "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev";
-  window.AE_API = API;
+  // Backend (portfolio-api): bookings, inbox, AI assistant, analytics. Set in config.js
+  const API = window.AE_API;
 
   // Privacy-friendly analytics: an anonymous random id, no cookies, no IP stored
   let visitor = "";
@@ -101,7 +47,7 @@
         track("section", e.target.id);
       });
     }, { threshold: 0.35 });
-    ["about", "experience", "projects", "skills", "contact"].forEach((id) => {
+    ["about", "experience", "projects", "services", "skills", "contact"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) io.observe(el);
     });
@@ -212,57 +158,25 @@
     els.forEach((el) => io.observe(el));
   }
 
-  // Render projects
-  function renderProjects() {
-    const list = $("#projectsList");
-    if (!list) return;
-
-    list.innerHTML = PROFILE.projects.map((p, i) => {
-      const stack = p.stack.map((s) => `<li>${s}</li>`).join("");
-      const links = [];
-      if (p.live) {
-        links.push(`<a class="plink" href="${p.live}" target="_blank" rel="noreferrer">Live demo <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a>`);
-      }
-      if (p.github) {
-        links.push(`<a class="plink" href="${p.github}" target="_blank" rel="noreferrer"><svg width="18" height="18" class="ico"><use href="#i-github"/></svg> Source <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a>`);
-      }
-      if (!links.length) {
-        links.push(`<span class="plink plink--muted"><svg width="18" height="18" class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span>`);
-      }
-
-      const stats = p.stats
-        ? `<dl class="pstats">${p.stats.map(([n, l]) => `<div><dt>${l}</dt><dd>${n}</dd></div>`).join("")}</dl>`
-        : "";
-      const bullets = p.bullets
-        ? `<ul class="project__bullets">${p.bullets.map((b) => `<li>${b}</li>`).join("")}</ul>`
-        : "";
-
-      return `
-        <article class="project${p.featured ? " project--featured" : ""} reveal">
-          <div class="project__num mono">${String(i + 1).padStart(2, "0")}</div>
-          <div class="project__main">
-            <p class="project__kind mono">${p.kind}</p>
-            <h3 class="project__title">${p.title}</h3>
-            <p class="project__desc">${p.desc}</p>
-            ${stats}
-            ${bullets}
-            <ul class="stack">${stack}</ul>
-          </div>
-          <div class="project__links">${links.join("")}</div>
-        </article>`;
-    }).join("");
-  }
-
-  // Render skills
-  function renderSkills() {
-    const grid = $("#skillsGrid");
-    if (!grid) return;
-
-    grid.innerHTML = PROFILE.skills.map((g) => `
-      <div class="skillGroup reveal">
-        <h3 class="skillGroup__title mono">${g.group}</h3>
-        <ul class="skillGroup__list">${g.items.map((s) => `<li>${s}</li>`).join("")}</ul>
-      </div>`).join("");
+  // Account button in the nav: "Sign in", or the signed-in person's avatar
+  function initAccountNav() {
+    const Auth = window.AEAuth;
+    const slot = $("#navAccount");
+    if (!Auth || !slot) return;
+    const render = (user) => {
+      const initials = (user?.displayName || user?.email || "?").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+      const href = user?.roles?.includes("Admin") ? "./admin.html" : "./account.html";
+      slot.innerHTML = user
+        ? `<a class="navAvatar" href="${href}" aria-label="Your account" title="${user.displayName || user.email}">${
+            user.avatarUrl ? `<img src="${user.avatarUrl}" alt="" />` : `<span>${initials}</span>`}</a>`
+        : `<a class="btn btn--line btn--sm navSignIn" href="./account.html">Sign in</a>`;
+      $$("[data-account-link]").forEach((a) => {
+        a.textContent = user ? (user.roles?.includes("Admin") ? "Dashboard" : "My account") : "Sign in";
+        a.href = href;
+      });
+    };
+    render(Auth.user);
+    Auth.onChange(render);
   }
 
   // Contact: copy email + EmailJS form (mailto fallback)
@@ -272,10 +186,10 @@
 
     $("#copyEmailBtn")?.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(PROFILE.email);
+        await navigator.clipboard.writeText(EMAIL());
         toast("Email copied to clipboard");
       } catch {
-        toast(PROFILE.email);
+        toast(EMAIL());
       }
     });
 
@@ -298,7 +212,7 @@
         from_name: name,
         from_email: email,
         message,
-        to_email: PROFILE.email
+        to_email: EMAIL()
       });
     };
     window.AE_sendEmail = sendEmail;
@@ -309,7 +223,7 @@
     const openMailto = (name, email, message) => {
       const subject = encodeURIComponent(`Portfolio contact from ${name}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-      window.location.href = `mailto:${PROFILE.email}?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:${EMAIL()}?subject=${subject}&body=${body}`;
     };
 
     form.addEventListener("submit", async (e) => {
@@ -360,8 +274,7 @@
   function boot() {
     initTheme();
     initNav();
-    renderProjects();
-    renderSkills();
+    initAccountNav();
     initActiveNav();
     initReveal();
     initContact();

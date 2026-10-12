@@ -105,6 +105,8 @@
     return `<label class="field">${label}<input name="${name}" maxlength="200" value="${esc(val)}" ${q.required ? "required" : ""} /></label>`;
   }
 
+  const me = () => (window.AEAuth?.signedIn ? window.AEAuth.user : null);
+
   function viewForm() {
     const slot = state.picker.slot;
     const end = new Date(Date.parse(slot) + state.type.duration * 60000).toISOString();
@@ -118,9 +120,10 @@
       ${state.notice ? `<p class="bm__notice" role="alert">${esc(state.notice)}</p>` : ""}
       <form class="bm__form" id="bookForm" novalidate>
         <div class="form__row">
-          <label class="field"><span>Your name</span><input name="name" autocomplete="name" maxlength="100" required value="${esc(state.draft.name)}" /></label>
-          <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" maxlength="200" required value="${esc(state.draft.email)}" /></label>
+          <label class="field"><span>Your name</span><input name="name" autocomplete="name" maxlength="100" required value="${esc(state.draft.name || me()?.displayName || "")}" /></label>
+          <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" maxlength="200" required value="${esc(me()?.email || state.draft.email)}" ${me() ? "readonly" : ""} /></label>
         </div>
+        ${me() ? `<p class="bm__fine">Booking as ${esc(me().email)}. You'll find it under <a href="./account.html#bookings">My account</a>.</p>` : `<p class="bm__fine"><a href="./account.html">Sign in</a> to manage your calls and chat with Ahmed in one place.</p>`}
         ${(state.type.questions || []).map(question).join("")}
         <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off" /></label>
         <button class="btn btn--accent btn--block" type="submit">Confirm booking</button>
@@ -245,9 +248,11 @@
     btn.disabled = true;
     btn.textContent = "Booking…";
     try {
+      // Signed-in clients book with their account, so the call shows up under "My account"
+      const token = window.AEAuth?.signedIn ? await window.AEAuth.accessToken().catch(() => null) : null;
       const res = await fetch(`${API}/book`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: "Bearer " + token } : {}) },
         body: JSON.stringify(state.legacy
           ? { start: state.picker.slot, name, email, topic: answers.topic || "", website: f.website.value }
           : { type: state.type.id, start: state.picker.slot, name, email, tz: B.tz, answers, website: f.website.value })
@@ -280,7 +285,7 @@
       state.notice = {
         email_invalid: "Please enter a valid email address.",
         answer_required: "Please answer the required questions.",
-        too_many_bookings: "You already have upcoming calls booked. Use the link in your confirmation email to change them.",
+        too_many_bookings: "You already have upcoming calls booked. Use the link in your confirmation email, or My account, to change them.",
         rate_limited: "Too many attempts. Please try again later."
       }[data.error] || "Something went wrong. Please try again.";
       render();
