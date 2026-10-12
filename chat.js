@@ -1,17 +1,12 @@
 (() => {
-  // After `npx wrangler deploy`, paste your Worker URL here (it ends with /chat).
-  // Until it's set, the chat button stays hidden so visitors never see a broken widget.
-  const ENDPOINT = "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev/chat";
-  const LOCAL_ENDPOINT = "http://localhost:8787/chat"; // `npx wrangler dev`
+  // The backend address comes from config.js
+  const endpoint = window.AE_API + "/chat";
 
   const EMAIL = "ahmeddagla99@gmail.com";
   const STORE_KEY = "ae_chat_v1";
   const GREETING = "Hi! I'm Ahmed's AI assistant. Ask me about his experience or projects, or leave a message and I'll pass it to him.";
   const SUGGESTIONS = ["What has Ahmed built?", "Tell me about his .NET experience", "Can I book a call?"];
 
-  const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
-  const endpoint = isLocal ? LOCAL_ENDPOINT : ENDPOINT;
-  if (!isLocal && endpoint.includes("YOUR-SUBDOMAIN")) return;
 
   // ---------- State ----------
   let messages = [];      // { role: "user" | "assistant", text }
@@ -90,7 +85,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </form>
-      <p class="chat__note">AI can make mistakes. For anything important, email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+      <p class="chat__note">AI can make mistakes. To talk to Ahmed himself, <a href="./account.html#chat">message him directly</a> or email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
     </section>`;
   document.body.appendChild(root);
 

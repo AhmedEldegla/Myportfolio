@@ -1,8 +1,7 @@
 (() => {
-  const API = ["localhost", "127.0.0.1"].includes(location.hostname)
-    ? "http://localhost:8787"
-    : "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev";
-  const SETUP_URL = "https://github.com/AhmedEldegla/Myportfolio/blob/main/worker/SETUP.md";
+  const API = window.AE_API;
+  const SETUP_URL = "https://github.com/AhmedEldegla/portfolio-api/blob/main/DEPLOY.md";
+  const Auth = window.AEAuth;
   const C = window.AECharts;
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -12,20 +11,22 @@
   const pad = (n) => String(n).padStart(2, "0");
   const DAY = 86400000;
 
-  // ---------- Session ----------
-  const S = { token: "", tz: "Africa/Cairo", me: null, route: "overview", param: "", cache: {}, counts: {} };
-  try { S.token = localStorage.getItem("ae_admin_token") || sessionStorage.getItem("ae_admin_token") || ""; } catch {}
+  // ---------- Session (shared with the website through auth.js) ----------
+  const S = { tz: "Africa/Cairo", me: null, route: "overview", param: "", cache: {}, counts: {} };
 
   async function api(path, opts = {}) {
-    const res = await fetch(API + path, {
-      ...opts,
-      headers: { ...(opts.body ? { "Content-Type": "application/json" } : {}), ...(opts.headers || {}), Authorization: "Bearer " + S.token },
-      body: opts.body ? JSON.stringify(opts.body) : undefined
-    });
-    if (res.status === 401) { signOut("Your session ended. Please sign in again."); throw new Error("unauthorized"); }
-    const data = res.headers.get("Content-Type")?.includes("json") ? await res.json() : res;
-    if (!res.ok) { const err = new Error(data?.message || data?.error || String(res.status)); err.data = data; throw err; }
-    return data;
+    try {
+      return await Auth.json(path, opts);
+    } catch (err) {
+      if (err.status === 401 || (err.status === 403 && !Auth.isAdmin)) {
+        signOut("Your session ended. Please sign in again.");
+        throw new Error("unauthorized");
+      }
+      const e = new Error(err.message);
+      e.data = err.data;
+      e.status = err.status;
+      throw e;
+    }
   }
 
   // ---------- Time in Ahmed's timezone ----------
@@ -100,44 +101,52 @@
 
   // ---------- Sign in / out ----------
   function showLogin(msg = "") {
+    S.live?.stop();
+    S.live = null;
     $("#app").hidden = true;
     $("#login").hidden = false;
     $("#loginErr").textContent = msg;
-    setTimeout(() => $("#pw").focus(), 50);
+    setTimeout(() => ($("#email").value ? $("#pw") : $("#email")).focus(), 50);
   }
 
   function signOut(msg = "") {
-    if (S.token) fetch(API + "/admin/logout", { method: "POST", headers: { Authorization: "Bearer " + S.token } }).catch(() => {});
-    S.token = "";
-    try { localStorage.removeItem("ae_admin_token"); sessionStorage.removeItem("ae_admin_token"); } catch {}
+    Auth.logout();
     showLogin(msg);
   }
 
   $("#loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector("button");
+    const btn = e.target.querySelector("button[type=submit]");
     btn.disabled = true;
     btn.textContent = "Signing in…";
     $("#loginErr").textContent = "";
     try {
-      const res = await fetch(API + "/admin/login", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: $("#pw").value })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        $("#loginErr").textContent = { wrong_password: "Wrong password.", rate_limited: "Too many attempts. Wait a few minutes.", admin_not_configured: "ADMIN_PASSWORD isn't set on the server yet." }[data.error] || "Couldn't sign in.";
+      const user = await Auth.login($("#email").value.trim(), $("#pw").value);
+      $("#pw").value = "";
+      if (!user.roles?.includes("Admin")) {
+        await Auth.logout();
+        $("#loginErr").textContent = "This account isn't the admin account. Clients sign in on the website.";
         return;
       }
-      S.token = data.token;
-      try { ($("#remember").checked ? localStorage : sessionStorage).setItem("ae_admin_token", data.token); } catch {}
-      $("#pw").value = "";
       start();
-    } catch {
-      $("#loginErr").textContent = "Can't reach the server.";
+    } catch (err) {
+      $("#loginErr").textContent = {
+        invalid_credentials: "Wrong email or password.",
+        locked: "Too many attempts. Wait a few minutes.",
+        rate_limited: "Too many attempts. Wait a few minutes.",
+        network: "Can't reach the server."
+      }[err.code] || "Couldn't sign in.";
     } finally {
       btn.disabled = false;
       btn.textContent = "Sign in";
     }
+  });
+
+  $("#forgotBtn")?.addEventListener("click", async () => {
+    const email = $("#email").value.trim();
+    if (!email) { $("#loginErr").textContent = "Enter your email first."; return; }
+    await Auth.forgot(email).catch(() => {});
+    $("#loginErr").textContent = "If that's the admin email, a reset link is on its way.";
   });
 
   // ---------- Router ----------
@@ -191,7 +200,7 @@
     };
     const ints = S.me.integrations;
     const missing = [["google", "Connect Google Calendar for Meet links"], ["email", "Turn on emails (Resend)"], ["telegram", "Get instant Telegram alerts"]].filter(([key]) => !ints[key]);
-    const feedIcon = { booking: "i-cal", cancelled: "i-x", message: "i-mail", lead: "i-chat", chat: "i-chat" };
+    const feedIcon = { booking: "i-cal", cancelled: "i-x", message: "i-mail", lead: "i-chat", chat: "i-chat", client: "i-user" };
 
     view.innerHTML = `
       <div class="grid g-tiles">
@@ -199,6 +208,7 @@
         <div class="card tile" style="--i:1"><span class="tile__label">Bookings · 30 days</span><span class="tile__value">${C.fmtN(k.bookings30)}</span>${delta(k.bookings30, k.bookingsPrev30)}</div>
         <div class="card tile" style="--i:2"><span class="tile__label">Visitors · 30 days</span><span class="tile__value">${C.fmtN(k.visitors30)}</span>${delta(k.visitors30, k.visitorsPrev30)}</div>
         <a class="card tile" href="#/inbox" style="--i:3"><span class="tile__label">${icon("i-inbox")} New messages</span><span class="tile__value">${k.newMessages}</span><span class="tile__delta">${k.chats30} AI chats in 30 days</span></a>
+        <a class="card tile" href="#/live" style="--i:4"><span class="tile__label">${icon("i-chat")} Unread chat</span><span class="tile__value">${k.liveUnread ?? 0}</span><span class="tile__delta">${k.clients ?? 0} client account${k.clients === 1 ? "" : "s"}</span></a>
       </div>
       <div class="grid g-2 mt">
         <div class="card" style="--i:4"><div class="card__head"><div><h2>Bookings per week</h2><p>Calls booked, last 12 weeks</p></div></div>
@@ -886,12 +896,14 @@
       if (S.counts.upcoming !== undefined && (k.bookings30 > S.counts.bookings30)) toast("New booking just came in");
       else if (S.counts.newMessages !== undefined && k.newMessages > S.counts.newMessages) toast("New message in your inbox");
       S.counts = k;
+      window.AEAdmin.onCounts.forEach((fn) => { try { fn(k); } catch {} });
       document.title = `${k.newMessages ? `(${k.newMessages}) ` : ""}${$("#pageTitle").textContent} · Dashboard`;
     } catch {}
   }
 
   // ---------- Start ----------
   async function start() {
+    if (!Auth.signedIn || !Auth.isAdmin) return showLogin();
     try {
       S.me = await api("/admin/me");
     } catch (err) {
@@ -902,11 +914,18 @@
     $("#login").hidden = true;
     $("#app").hidden = false;
     C.bindTooltips($("#tip"));
+    window.AEAdmin.onStart.forEach((fn) => { try { fn(); } catch (err) { console.error(err); } });
     await route();
     refreshCounts();
     clearInterval(S.poll);
     S.poll = setInterval(() => { if (!document.hidden) refreshCounts(); }, 60000);
   }
 
-  if (S.token) start(); else showLogin();
+  // Shared with admin/cms.js, which adds the website editors, media, clients and live chat
+  window.AEAdmin = {
+    S, api, esc, icon, toast, dialog, setHead, ago, fmt, fmtFull, fmtDay, fmtTime, skeleton, route, refreshCounts, ROUTES, C,
+    onStart: [], onCounts: []
+  };
+
+  document.addEventListener("DOMContentLoaded", start);
 })();

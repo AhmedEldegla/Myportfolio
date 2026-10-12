@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
   <meta name="robots" content="index,follow" />
-  <meta name="description" content="Ahmed Eldegla - Backend developer (.NET & C++) building ASP.NET Core APIs with Clean Architecture and CQRS, with 7+ years in software and a background in real-time C++ networking." />
   <meta name="theme-color" content="#0e0f11" />
-  <link rel="canonical" href="https://ahmedeldegla.github.io/portfolio/" />
+  <link rel="canonical" href="https://www.ahmedeldegla.com/" />
 
+  <!--cms:seo-->
   <title>Ahmed Eldegla | Backend Developer (.NET &amp; C++)</title>
+  <meta name="description" content="Ahmed Eldegla - Backend developer (.NET &amp; C++) building ASP.NET Core APIs with Clean Architecture and CQRS, with 7+ years in software and a background in real-time C++ networking." />
+  <!--/cms:seo-->
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
@@ -18,35 +20,23 @@
   <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Ahmed Eldegla | Backend Developer (.NET & C++)" />
-  <meta property="og:description" content="Backend developer (.NET & C++) building ASP.NET Core APIs with Clean Architecture and CQRS. 7+ years in software." />
+  <!-- Open Graph + Twitter -->
+  <!--cms:social-->
+  <meta property="og:title" content="Ahmed Eldegla | Backend Developer (.NET &amp; C++)" />
+  <meta property="og:description" content="Ahmed Eldegla - Backend developer (.NET &amp; C++) building ASP.NET Core APIs with Clean Architecture and CQRS, with 7+ years in software and a background in real-time C++ networking." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://ahmedeldegla.github.io/portfolio/" />
-  <meta property="og:image" content="https://ahmedeldegla.github.io/portfolio/assets/profile.jpg" />
-
-  <!-- Twitter -->
+  <meta property="og:url" content="https://www.ahmedeldegla.com/" />
+  <meta property="og:image" content="https://www.ahmedeldegla.com/assets/profile.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Ahmed Eldegla | Backend Developer (.NET & C++)" />
-  <meta name="twitter:description" content="Backend developer (.NET & C++) building ASP.NET Core APIs with Clean Architecture and CQRS. 7+ years in software." />
-  <meta name="twitter:image" content="https://ahmedeldegla.github.io/portfolio/assets/profile.jpg" />
+  <meta name="twitter:title" content="Ahmed Eldegla | Backend Developer (.NET &amp; C++)" />
+  <meta name="twitter:description" content="Ahmed Eldegla - Backend developer (.NET &amp; C++) building ASP.NET Core APIs with Clean Architecture and CQRS, with 7+ years in software and a background in real-time C++ networking." />
+  <meta name="twitter:image" content="https://www.ahmedeldegla.com/assets/profile.jpg" />
+  <!--/cms:social-->
 
   <!-- JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Person",
-    "name":"Ahmed Eldegla",
-    "jobTitle":"Backend Developer (.NET & C++)",
-    "address":{"@type":"PostalAddress","addressLocality":"Mansoura","addressCountry":"EG"},
-    "url":"https://ahmedeldegla.github.io/portfolio/",
-    "image":"https://ahmedeldegla.github.io/portfolio/assets/profile.jpg",
-    "sameAs":[
-      "https://www.linkedin.com/in/ahmed-eldegla-2a751b184/",
-      "https://github.com/AhmedEldegla"
-    ]
-  }
-  </script>
+  <!--cms:jsonld-->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Ahmed Eldegla","jobTitle":"Backend Developer (.NET & C++)","address":{"@type":"PostalAddress","addressLocality":"Mansoura"},"url":"https://www.ahmedeldegla.com/","image":"https://www.ahmedeldegla.com/assets/profile.jpg","sameAs":["https://www.linkedin.com/in/ahmed-eldegla-2a751b184/","https://github.com/AhmedEldegla"]}</script>
+  <!--/cms:jsonld-->
 
   <!-- Apply saved theme before paint -->
   <script>
@@ -80,10 +70,13 @@
   <link rel="stylesheet" href="./motion.css?v=6" />
   <link rel="stylesheet" href="./intro.css?v=8" />
   <link rel="stylesheet" href="./flair.css?v=8" />
-  <script src="./app.js?v=9" defer></script>
-  <script src="./chat.js?v=9" defer></script>
-  <script src="./booking-core.js?v=9" defer></script>
-  <script src="./booking.js?v=9" defer></script>
+  <link rel="stylesheet" href="./cms.css?v=1" />
+  <script src="./config.js?v=1" defer></script>
+  <script src="./auth.js?v=1" defer></script>
+  <script src="./app.js?v=10" defer></script>
+  <script src="./chat.js?v=10" defer></script>
+  <script src="./booking-core.js?v=10" defer></script>
+  <script src="./booking.js?v=11" defer></script>
   <script src="./motion.js?v=6" defer></script>
   <script src="./intro.js?v=8" defer></script>
   <script src="./vendor/lenis.min.js?v=1.3.26" defer></script>
@@ -147,12 +140,14 @@
         <span class="brand__text">Ahmed Eldegla</span>
       </a>
 
-      <nav class="nav__links" aria-label="Primary">
+      <nav class="nav__links" aria-label="Primary"><!--cms:navlinks-->
         <a class="nav__link" href="#about">About</a>
         <a class="nav__link" href="#experience">Experience</a>
         <a class="nav__link" href="#projects">Projects</a>
+        <a class="nav__link" href="#services">Services</a>
         <a class="nav__link" href="#skills">Skills</a>
         <a class="nav__link" href="#contact">Contact</a>
+      <!--/cms:navlinks-->
       </nav>
 
       <div class="nav__actions">
@@ -160,7 +155,8 @@
           <svg width="18" height="18" class="ico ico--moon"><use href="#i-moon"/></svg>
           <svg width="18" height="18" class="ico ico--sun"><use href="#i-sun"/></svg>
         </button>
-        <a class="btn btn--line btn--sm nav__cv" href="https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing" target="_blank" rel="noreferrer">Resume</a>
+        <!--cms:navcv--><a class="btn btn--line btn--sm nav__cv" href="https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing" target="_blank" rel="noreferrer">Resume</a><!--/cms:navcv-->
+        <span id="navAccount"></span>
         <button class="btn btn--accent btn--sm nav__book" type="button" data-book aria-label="Book a call">
           <svg width="18" height="18" class="ico"><use href="#i-cal"/></svg><span class="nav__bookText">Book a call</span>
         </button>
@@ -171,16 +167,19 @@
     </div>
 
     <div class="mobile" id="mobileMenu" hidden>
-      <div class="container mobile__inner">
+      <div class="container mobile__inner"><!--cms:mobilelinks-->
         <a href="#about" class="mobile__link">About</a>
         <a href="#experience" class="mobile__link">Experience</a>
         <a href="#projects" class="mobile__link">Projects</a>
+        <a href="#services" class="mobile__link">Services</a>
         <a href="#skills" class="mobile__link">Skills</a>
         <a href="#contact" class="mobile__link">Contact</a>
+        <!--/cms:mobilelinks-->
         <button class="btn btn--accent" type="button" data-book>
           <svg width="18" height="18" class="ico"><use href="#i-cal"/></svg> Book a call
         </button>
-        <a class="btn btn--line" href="https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing" target="_blank" rel="noreferrer">Resume</a>
+        <!--cms:mobilecv--><a class="btn btn--line" href="https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing" target="_blank" rel="noreferrer">Resume</a><!--/cms:mobilecv-->
+        <a class="btn btn--line" href="./account.html" data-account-link>Sign in</a>
       </div>
     </div>
   </header>
@@ -188,7 +187,7 @@
   <main id="main">
     <!-- HERO -->
     <section id="home" class="hero container">
-      <div class="hero__copy">
+      <div class="hero__copy"><!--cms:hero-->
         <p class="status reveal"><span class="status__dot" aria-hidden="true"></span>Open to backend roles and projects</p>
 
         <h1 class="hero__title reveal">
@@ -196,9 +195,7 @@
         </h1>
 
         <p class="hero__lead reveal">
-          I'm Ahmed Eldegla, a backend developer building RESTful APIs with ASP.NET Core, EF Core and
-          SQL Server, structured with Clean Architecture and CQRS. Before .NET I spent seven years as a
-          freelance C++ engineer in real-time networking, where slow or unstable code shows up right away.
+          I&#39;m Ahmed Eldegla, a backend developer building RESTful APIs with ASP.NET Core, EF Core and SQL Server, structured with Clean Architecture and CQRS. Before .NET I spent seven years as a freelance C++ engineer in real-time networking, where slow or unstable code shows up right away.
         </p>
 
         <div class="hero__cta reveal">
@@ -207,28 +204,28 @@
           </button>
           <a class="btn btn--line" href="#projects">See my work</a>
           <div class="hero__social">
-            <a class="iconBtn" href="https://github.com/AhmedEldegla" target="_blank" rel="noreferrer" aria-label="GitHub">
-              <svg width="18" height="18" class="ico"><use href="#i-github"/></svg>
-            </a>
             <a class="iconBtn" href="https://www.linkedin.com/in/ahmed-eldegla-2a751b184/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
               <svg width="18" height="18" class="ico"><use href="#i-linkedin"/></svg>
+            </a>
+            <a class="iconBtn" href="https://github.com/AhmedEldegla" target="_blank" rel="noreferrer" aria-label="GitHub">
+              <svg width="18" height="18" class="ico"><use href="#i-github"/></svg>
             </a>
             <a class="iconBtn" href="https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing" target="_blank" rel="noreferrer" aria-label="Resume (PDF)">
               <svg width="18" height="18" class="ico"><use href="#i-file"/></svg>
             </a>
           </div>
         </div>
-      </div>
+      <!--/cms:hero--></div>
 
-      <figure class="portrait reveal">
+      <figure class="portrait reveal"><!--cms:portrait-->
         <img src="./assets/profile.jpg" alt="Portrait of Ahmed Eldegla" width="1920" height="2560" loading="eager" fetchpriority="high" />
         <figcaption class="portrait__cap">
           <span>Ahmed Eldegla</span>
           <span class="mono">Mansoura, Egypt</span>
         </figcaption>
-      </figure>
+      <!--/cms:portrait--></figure>
 
-      <dl class="facts reveal">
+      <dl class="facts reveal"><!--cms:facts-->
         <div class="fact">
           <dt>Experience</dt>
           <dd>7+</dd>
@@ -245,15 +242,15 @@
           <dt>What I optimize for</dt>
           <dd>Reliable by design</dd>
         </div>
-      </dl>
+      <!--/cms:facts--></dl>
     </section>
 
     <!-- Tech marquee -->
     <div class="marquee" aria-hidden="true">
-      <div class="marquee__track">
+      <div class="marquee__track"><!--cms:marquee-->
         <div class="marquee__group"><span class="marquee__item">ASP.NET Core</span><span class="marquee__star">✦</span><span class="marquee__item">Clean Architecture</span><span class="marquee__star">✦</span><span class="marquee__item">CQRS</span><span class="marquee__star">✦</span><span class="marquee__item">EF Core</span><span class="marquee__star">✦</span><span class="marquee__item">SQL Server</span><span class="marquee__star">✦</span><span class="marquee__item">C++</span><span class="marquee__star">✦</span><span class="marquee__item">Real-time networking</span><span class="marquee__star">✦</span><span class="marquee__item">JWT &amp; Identity</span><span class="marquee__star">✦</span><span class="marquee__item">MediatR</span><span class="marquee__star">✦</span><span class="marquee__item">REST APIs</span><span class="marquee__star">✦</span></div>
         <div class="marquee__group"><span class="marquee__item">ASP.NET Core</span><span class="marquee__star">✦</span><span class="marquee__item">Clean Architecture</span><span class="marquee__star">✦</span><span class="marquee__item">CQRS</span><span class="marquee__star">✦</span><span class="marquee__item">EF Core</span><span class="marquee__star">✦</span><span class="marquee__item">SQL Server</span><span class="marquee__star">✦</span><span class="marquee__item">C++</span><span class="marquee__star">✦</span><span class="marquee__item">Real-time networking</span><span class="marquee__star">✦</span><span class="marquee__item">JWT &amp; Identity</span><span class="marquee__star">✦</span><span class="marquee__item">MediatR</span><span class="marquee__star">✦</span><span class="marquee__item">REST APIs</span><span class="marquee__star">✦</span></div>
-      </div>
+      <!--/cms:marquee--></div>
     </div>
 
     <!-- ABOUT -->
@@ -263,25 +260,21 @@
         <h2 class="section__title">About</h2>
       </header>
 
-      <div class="about">
+      <div class="about"><!--cms:about-->
         <p class="about__big reveal">
-          From inspecting live game traffic packet by packet to designing clean REST APIs,
-          what I care about is the same: code that stays fast, predictable, and easy to debug.
+          From inspecting live game traffic packet by packet to designing clean REST APIs, what I care about is the same: code that stays fast, predictable, and easy to debug.
         </p>
         <div class="about__cols reveal">
           <div>
             <h3 class="mini">What I bring from C++</h3>
-            <p>Seven years of freelance C++ in real-time networking and game systems: multithreading,
-              profiling, and tracking down crashes and memory issues with debuggers. It taught me to read
-              unfamiliar code quickly and to care about latency and stability.</p>
+            <p>Seven years of freelance C++ in real-time networking and game systems: multithreading, profiling, and tracking down crashes and memory issues with debuggers. It taught me to read unfamiliar code quickly and to care about latency and stability.</p>
           </div>
           <div>
             <h3 class="mini">What I build now</h3>
-            <p>RESTful APIs with ASP.NET Core, EF Core and SQL Server, structured with Clean Architecture
-              and CQRS (MediatR), secured with JWT and ASP.NET Core Identity, and documented with Swagger.</p>
+            <p>RESTful APIs with ASP.NET Core, EF Core and SQL Server, structured with Clean Architecture and CQRS (MediatR), secured with JWT and ASP.NET Core Identity, and documented with Swagger.</p>
           </div>
         </div>
-      </div>
+      <!--/cms:about--></div>
     </section>
 
     <!-- EXPERIENCE -->
@@ -291,7 +284,7 @@
         <h2 class="section__title">Experience</h2>
       </header>
 
-      <ol class="timeline">
+      <ol class="timeline"><!--cms:experience-->
         <li class="job reveal">
           <div class="job__when mono">2025 – 2026</div>
           <div class="job__body">
@@ -299,7 +292,7 @@
             <p class="job__org">Digital Egypt Pioneers Initiative (DEPI) · Ministry of Communications and IT, Mansoura</p>
             <ul class="job__list">
               <li>Intensive training in C#, ASP.NET Core, EF Core, SQL Server and software architecture.</li>
-              <li>Graduation project: the DEPI Smart Freelance Platform backend, as the team's top contributor and repository owner.</li>
+              <li>Graduation project: the DEPI Smart Freelance Platform backend, as the team&#39;s top contributor and repository owner.</li>
             </ul>
           </div>
         </li>
@@ -327,7 +320,7 @@
             </ul>
           </div>
         </li>
-      </ol>
+      <!--/cms:experience--></ol>
     </section>
 
     <!-- PROJECTS -->
@@ -337,8 +330,91 @@
         <h2 class="section__title">Selected projects</h2>
       </header>
 
-      <div class="projects" id="projectsList"></div>
+      <div class="projects" id="projectsList"><!--cms:projects-->
+        <article class="project project--featured reveal" id="project-depi-smart-freelance-platform">
+          <div class="project__num mono">01</div>
+          <div class="project__main">
+            
+            <p class="project__kind mono">Backend API · Team of 5 · 2026</p>
+            <h3 class="project__title">DEPI Smart Freelance Platform</h3>
+            <p class="project__desc">The backend of a freelance marketplace: projects, proposals, milestone contracts, escrow wallets, messaging, reviews, guilds and communities. I was the team&#39;s top contributor and repository owner.</p>
+            <dl class="pstats"><div><dt>controllers</dt><dd>17</dd></div><div><dt>Clean Architecture layers</dt><dd>4</dd></div><div><dt>developers</dt><dd>5</dd></div></dl>
+            <ul class="project__bullets"><li>Structured the solution in 4 layers (Domain, Application, Infrastructure, API) with Clean Architecture and CQRS via MediatR.</li><li>Implemented authentication and authorization with ASP.NET Core Identity and JWT, including role/permission management and user sessions.</li><li>Designed the SQL Server data model with EF Core, fixed shadow foreign-key mapping issues, and delivered SQL scripts and backups for the data analysis team.</li><li>Added global exception-handling middleware, MediatR logging behaviors, request validation, rate limiting, health checks, and GitHub Actions workflows.</li></ul>
+            <ul class="stack"><li>ASP.NET Core 8</li><li>EF Core</li><li>SQL Server</li><li>MediatR</li><li>JWT</li><li>Identity</li><li>AutoMapper</li><li>FluentValidation</li><li>Swagger</li></ul>
+          </div>
+          <div class="project__links"><a class="plink" href="https://github.com/AhmedEldegla/Depi" target="_blank" rel="noreferrer"><svg width="18" height="18" class="ico"><use href="#i-github"/></svg> Source <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a></div>
+        </article>
+        <article class="project reveal" id="project-mo7amek">
+          <div class="project__num mono">02</div>
+          <div class="project__main">
+            
+            <p class="project__kind mono">Legal practice management</p>
+            <h3 class="project__title">Mo7amek</h3>
+            <p class="project__desc">A management system for law offices that organizes cases, clients, appointments, and day-to-day office workflows.</p>
+            
+            
+            <ul class="stack"><li>.NET API</li><li>SQL Server</li></ul>
+          </div>
+          <div class="project__links"><span class="plink plink--muted"><svg width="18" height="18" class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span></div>
+        </article>
+        <article class="project reveal" id="project-cashier-pos-system">
+          <div class="project__num mono">03</div>
+          <div class="project__main">
+            
+            <p class="project__kind mono">Point of sale</p>
+            <h3 class="project__title">Cashier POS System</h3>
+            <p class="project__desc">Point-of-sale backend for cashier workflows: sales operations, transactions, and business data management.</p>
+            
+            
+            <ul class="stack"><li>.NET API</li><li>SQL Server</li></ul>
+          </div>
+          <div class="project__links"><span class="plink plink--muted"><svg width="18" height="18" class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span></div>
+        </article>
+        <article class="project reveal" id="project-smart-accountant">
+          <div class="project__num mono">04</div>
+          <div class="project__main">
+            
+            <p class="project__kind mono">Dashboard</p>
+            <h3 class="project__title">Smart Accountant</h3>
+            <p class="project__desc">A dashboard for accounting workflows that gives business owners a clear view of their numbers.</p>
+            
+            
+            <ul class="stack"><li>Web</li><li>Dashboard</li></ul>
+          </div>
+          <div class="project__links"><span class="plink plink--muted"><svg width="18" height="18" class="ico"><use href="#i-lock"/></svg> Private repo, walkthrough on request</span></div>
+        </article>
+      <!--/cms:projects--></div>
     </section>
+
+    <!-- SERVICES (only when there are any) -->
+    <!--cms:services-->
+    <section id="services" class="section container">
+      <header class="section__head reveal">
+        <span class="section__index mono">✦</span>
+        <h2 class="section__title">Services</h2>
+      </header>
+      <div class="services">
+        <article class="service reveal">
+          <h3 class="service__title">Backend API development</h3>
+          <p class="service__desc">RESTful APIs with ASP.NET Core, EF Core and SQL Server: authentication, roles, validation, documentation and tests.</p>
+          
+          <button class="linkBtn service__cta" type="button" data-book>Book a call about this <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="service reveal">
+          <h3 class="service__title">Architecture &amp; code review</h3>
+          <p class="service__desc">A review of your .NET codebase with clear, prioritized fixes for structure, performance and reliability.</p>
+          
+          <button class="linkBtn service__cta" type="button" data-book>Book a call about this <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="service reveal">
+          <h3 class="service__title">Performance troubleshooting</h3>
+          <p class="service__desc">Find and fix slow queries, memory issues and bottlenecks, with measurements before and after.</p>
+          
+          <button class="linkBtn service__cta" type="button" data-book>Book a call about this <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></button>
+        </article>
+      </div>
+    </section>
+    <!--/cms:services-->
 
     <!-- BOOK A CALL (opens the booking window) -->
     <section id="book" class="container">
@@ -361,7 +437,32 @@
         <h2 class="section__title">Skills</h2>
       </header>
 
-      <div class="skills" id="skillsGrid"></div>
+      <div class="skills" id="skillsGrid"><!--cms:skills-->
+        <div class="skillGroup reveal">
+          <h3 class="skillGroup__title mono">Backend</h3>
+          <ul class="skillGroup__list"><li>C#</li><li>ASP.NET Core Web API (.NET 8)</li><li>RESTful APIs</li><li>Entity Framework Core</li><li>LINQ</li><li>MediatR</li><li>AutoMapper</li><li>FluentValidation</li></ul>
+        </div>
+        <div class="skillGroup reveal">
+          <h3 class="skillGroup__title mono">Architecture</h3>
+          <ul class="skillGroup__list"><li>Clean Architecture</li><li>CQRS</li><li>Repository Pattern</li><li>Result Pattern</li><li>Domain Events</li><li>Dependency Injection</li><li>SOLID · OOP</li></ul>
+        </div>
+        <div class="skillGroup reveal">
+          <h3 class="skillGroup__title mono">Security</h3>
+          <ul class="skillGroup__list"><li>JWT Authentication</li><li>ASP.NET Core Identity</li><li>Role &amp; permission-based authorization</li><li>Rate limiting</li></ul>
+        </div>
+        <div class="skillGroup reveal">
+          <h3 class="skillGroup__title mono">Databases</h3>
+          <ul class="skillGroup__list"><li>SQL Server</li><li>T-SQL</li><li>EF Core Migrations</li><li>Database design &amp; relationships</li></ul>
+        </div>
+        <div class="skillGroup reveal">
+          <h3 class="skillGroup__title mono">Systems</h3>
+          <ul class="skillGroup__list"><li>C++</li><li>Multithreading</li><li>Data structures &amp; algorithms</li><li>Real-time networking</li><li>Debugging</li><li>Performance optimization</li></ul>
+        </div>
+        <div class="skillGroup reveal">
+          <h3 class="skillGroup__title mono">Tools</h3>
+          <ul class="skillGroup__list"><li>Git &amp; GitHub</li><li>GitHub Actions</li><li>Swagger / OpenAPI</li><li>Visual Studio</li><li>SSMS</li></ul>
+        </div>
+      <!--/cms:skills--></div>
     </section>
 
     <!-- Big type that slides with scroll -->
@@ -378,8 +479,8 @@
       </header>
 
       <div class="contact__grid">
-        <div class="contact__intro reveal">
-          <p class="contact__big">Need a backend developer? Let's talk.</p>
+        <div class="contact__intro reveal"><!--cms:contact-->
+          <p class="contact__big">Need a backend developer? Let&#39;s talk.</p>
           <p class="muted">Email me, or <button class="linkBtn" type="button" data-book>book a call</button> directly.</p>
 
           <div class="emailRow">
@@ -394,7 +495,7 @@
             <li><a href="https://github.com/AhmedEldegla" target="_blank" rel="noreferrer"><svg width="18" height="18" class="ico"><use href="#i-github"/></svg> GitHub <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a></li>
             <li><a href="https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing" target="_blank" rel="noreferrer"><svg width="18" height="18" class="ico"><use href="#i-file"/></svg> Resume (PDF) <svg width="18" height="18" class="ico ico--sm"><use href="#i-arrow"/></svg></a></li>
           </ul>
-        </div>
+        <!--/cms:contact--></div>
 
         <form class="form reveal" id="contactForm" novalidate>
           <div class="form__row">

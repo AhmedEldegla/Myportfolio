@@ -1,0 +1,289 @@
+{
+  "site": {
+    "name": "Ahmed Eldegla",
+    "role": "Backend Developer (.NET & C++)",
+    "location": "Mansoura, Egypt",
+    "status": "Open to backend roles and projects",
+    "heroTitle": "I build *.NET* backends with the discipline of seven years in *C++*.",
+    "heroLead": "I'm Ahmed Eldegla, a backend developer building RESTful APIs with ASP.NET Core, EF Core and SQL Server, structured with Clean Architecture and CQRS. Before .NET I spent seven years as a freelance C++ engineer in real-time networking, where slow or unstable code shows up right away.",
+    "portraitUrl": "./assets/profile.jpg",
+    "cvUrl": "https://drive.google.com/file/d/1ERP4TigKxlr0o9qqvx4J5W_ZBx4k4BEQ/view?usp=sharing",
+    "email": "ahmeddagla99@gmail.com",
+    "facts": [
+      {
+        "label": "Experience",
+        "value": "7+"
+      },
+      {
+        "label": "Specialty",
+        "value": "Backend systems"
+      },
+      {
+        "label": "Engineering background",
+        "value": "C++ · Networking"
+      },
+      {
+        "label": "What I optimize for",
+        "value": "Reliable by design"
+      }
+    ],
+    "aboutStatement": "From inspecting live game traffic packet by packet to designing clean REST APIs, what I care about is the same: code that stays fast, predictable, and easy to debug.",
+    "aboutColumns": [
+      {
+        "title": "What I bring from C++",
+        "body": "Seven years of freelance C++ in real-time networking and game systems: multithreading, profiling, and tracking down crashes and memory issues with debuggers. It taught me to read unfamiliar code quickly and to care about latency and stability."
+      },
+      {
+        "title": "What I build now",
+        "body": "RESTful APIs with ASP.NET Core, EF Core and SQL Server, structured with Clean Architecture and CQRS (MediatR), secured with JWT and ASP.NET Core Identity, and documented with Swagger."
+      }
+    ],
+    "marquee": [
+      "ASP.NET Core",
+      "Clean Architecture",
+      "CQRS",
+      "EF Core",
+      "SQL Server",
+      "C++",
+      "Real-time networking",
+      "JWT & Identity",
+      "MediatR",
+      "REST APIs"
+    ],
+    "contactHeadline": "Need a backend developer? Let's talk.",
+    "contactText": "Email me, or book a call directly.",
+    "links": [
+      {
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/ahmed-eldegla-2a751b184/"
+      },
+      {
+        "label": "GitHub",
+        "url": "https://github.com/AhmedEldegla"
+      }
+    ],
+    "seoTitle": "Ahmed Eldegla | Backend Developer (.NET & C++)",
+    "seoDescription": "Ahmed Eldegla - Backend developer (.NET & C++) building ASP.NET Core APIs with Clean Architecture and CQRS, with 7+ years in software and a background in real-time C++ networking."
+  },
+  "projects": [
+    {
+      "id": "318b904b-ede2-4dd4-b0ad-2a342063e8c9",
+      "title": "DEPI Smart Freelance Platform",
+      "slug": "depi-smart-freelance-platform",
+      "kind": "Backend API · Team of 5 · 2026",
+      "summary": "The backend of a freelance marketplace: projects, proposals, milestone contracts, escrow wallets, messaging, reviews, guilds and communities. I was the team's top contributor and repository owner.",
+      "bullets": [
+        "Structured the solution in 4 layers (Domain, Application, Infrastructure, API) with Clean Architecture and CQRS via MediatR.",
+        "Implemented authentication and authorization with ASP.NET Core Identity and JWT, including role/permission management and user sessions.",
+        "Designed the SQL Server data model with EF Core, fixed shadow foreign-key mapping issues, and delivered SQL scripts and backups for the data analysis team.",
+        "Added global exception-handling middleware, MediatR logging behaviors, request validation, rate limiting, health checks, and GitHub Actions workflows."
+      ],
+      "stats": [
+        {
+          "value": "17",
+          "label": "controllers"
+        },
+        {
+          "value": "4",
+          "label": "Clean Architecture layers"
+        },
+        {
+          "value": "5",
+          "label": "developers"
+        }
+      ],
+      "stack": [
+        "ASP.NET Core 8",
+        "EF Core",
+        "SQL Server",
+        "MediatR",
+        "JWT",
+        "Identity",
+        "AutoMapper",
+        "FluentValidation",
+        "Swagger"
+      ],
+      "liveUrl": "",
+      "sourceUrl": "https://github.com/AhmedEldegla/Depi",
+      "imageUrl": "",
+      "featured": true
+    },
+    {
+      "id": "dd9ad7a7-262e-4db4-aa75-51c2657eb311",
+      "title": "Mo7amek",
+      "slug": "mo7amek",
+      "kind": "Legal practice management",
+      "summary": "A management system for law offices that organizes cases, clients, appointments, and day-to-day office workflows.",
+      "bullets": [],
+      "stats": [],
+      "stack": [
+        ".NET API",
+        "SQL Server"
+      ],
+      "liveUrl": "",
+      "sourceUrl": "",
+      "imageUrl": "",
+      "featured": false
+    },
+    {
+      "id": "8fded76e-d1eb-46d9-aefa-d378946d417b",
+      "title": "Cashier POS System",
+      "slug": "cashier-pos-system",
+      "kind": "Point of sale",
+      "summary": "Point-of-sale backend for cashier workflows: sales operations, transactions, and business data management.",
+      "bullets": [],
+      "stats": [],
+      "stack": [
+        ".NET API",
+        "SQL Server"
+      ],
+      "liveUrl": "",
+      "sourceUrl": "",
+      "imageUrl": "",
+      "featured": false
+    },
+    {
+      "id": "ced3f7e5-0b2e-40d4-a1bb-756848ae61b0",
+      "title": "Smart Accountant",
+      "slug": "smart-accountant",
+      "kind": "Dashboard",
+      "summary": "A dashboard for accounting workflows that gives business owners a clear view of their numbers.",
+      "bullets": [],
+      "stats": [],
+      "stack": [
+        "Web",
+        "Dashboard"
+      ],
+      "liveUrl": "",
+      "sourceUrl": "",
+      "imageUrl": "",
+      "featured": false
+    }
+  ],
+  "skills": [
+    {
+      "id": "5670bc44-0d29-4b1c-9a13-2d8b1078effb",
+      "name": "Backend",
+      "items": [
+        "C#",
+        "ASP.NET Core Web API (.NET 8)",
+        "RESTful APIs",
+        "Entity Framework Core",
+        "LINQ",
+        "MediatR",
+        "AutoMapper",
+        "FluentValidation"
+      ]
+    },
+    {
+      "id": "aaaae7e5-b9d9-4316-b79d-57be61178ccb",
+      "name": "Architecture",
+      "items": [
+        "Clean Architecture",
+        "CQRS",
+        "Repository Pattern",
+        "Result Pattern",
+        "Domain Events",
+        "Dependency Injection",
+        "SOLID · OOP"
+      ]
+    },
+    {
+      "id": "a6f77b6e-ead7-49e4-bde4-17096f265759",
+      "name": "Security",
+      "items": [
+        "JWT Authentication",
+        "ASP.NET Core Identity",
+        "Role & permission-based authorization",
+        "Rate limiting"
+      ]
+    },
+    {
+      "id": "ce3bd9e0-17c5-40e7-b6a1-8d35e827b0b5",
+      "name": "Databases",
+      "items": [
+        "SQL Server",
+        "T-SQL",
+        "EF Core Migrations",
+        "Database design & relationships"
+      ]
+    },
+    {
+      "id": "bdf094ec-ad30-4194-8b2b-fd543d57bc9d",
+      "name": "Systems",
+      "items": [
+        "C++",
+        "Multithreading",
+        "Data structures & algorithms",
+        "Real-time networking",
+        "Debugging",
+        "Performance optimization"
+      ]
+    },
+    {
+      "id": "f7c28f91-9482-44e1-b9a4-023993d4e291",
+      "name": "Tools",
+      "items": [
+        "Git & GitHub",
+        "GitHub Actions",
+        "Swagger / OpenAPI",
+        "Visual Studio",
+        "SSMS"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "id": "8b685088-a63b-49a2-b382-f834f28ffc63",
+      "title": ".NET Full Stack Track",
+      "organization": "Digital Egypt Pioneers Initiative (DEPI) · Ministry of Communications and IT, Mansoura",
+      "period": "2025 – 2026",
+      "bullets": [
+        "Intensive training in C#, ASP.NET Core, EF Core, SQL Server and software architecture.",
+        "Graduation project: the DEPI Smart Freelance Platform backend, as the team's top contributor and repository owner."
+      ]
+    },
+    {
+      "id": "d5741698-e74f-4797-8879-9f7feea93386",
+      "title": "C++ Networking Developer",
+      "organization": "Freelance",
+      "period": "2024 – 2025",
+      "bullets": [
+        "Built high-performance C++ packet inspection and filtering tools for online multiplayer games, processing live network traffic under strict real-time constraints.",
+        "Profiled, debugged and optimized multithreaded networking code with a focus on stability and low latency."
+      ]
+    },
+    {
+      "id": "762cfd97-7740-496a-9c27-f0302e3e79c3",
+      "title": "C++ Game Systems Developer",
+      "organization": "Freelance",
+      "period": "2017 – 2023",
+      "bullets": [
+        "Developed C++ extensions for real-time game clients, using static and dynamic binary analysis to understand undocumented systems.",
+        "Diagnosed complex crashes and memory issues with runtime debuggers and memory analysis tools."
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "52c7c080-df49-43dd-a849-bd2cff6da7eb",
+      "title": "Backend API development",
+      "description": "RESTful APIs with ASP.NET Core, EF Core and SQL Server: authentication, roles, validation, documentation and tests.",
+      "price": ""
+    },
+    {
+      "id": "b9c1caa9-1b7c-4278-8674-bdf1dd4ea887",
+      "title": "Architecture & code review",
+      "description": "A review of your .NET codebase with clear, prioritized fixes for structure, performance and reliability.",
+      "price": ""
+    },
+    {
+      "id": "d4c46d09-455b-4d67-b519-a114c6c85dee",
+      "title": "Performance troubleshooting",
+      "description": "Find and fix slow queries, memory issues and bottlenecks, with measurements before and after.",
+      "price": ""
+    }
+  ],
+  "pages": [],
+  "generatedAt": "2026-10-12T19:43:47.6465085Z"
+}

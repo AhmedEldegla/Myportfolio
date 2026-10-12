@@ -1,3 +1,6 @@
+> **Replaced.** The website now runs on the .NET backend in [portfolio-api](https://github.com/AhmedEldegla/portfolio-api) (see its DEPLOY.md).
+> This Worker is kept only to export its data once; you can delete it from Cloudflare afterwards.
+
 # Backend setup: bookings, dashboard, emails, Google Meet
 
 The backend is a Cloudflare Worker with a D1 database (both on Cloudflare's free tier).

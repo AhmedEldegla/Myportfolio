@@ -1,9 +1,7 @@
 // Shared by the booking window (booking.js) and the reschedule page (manage.js):
 // API address, formatting helpers and the month calendar + time list picker.
 window.AEBooking = (() => {
-  const API = ["localhost", "127.0.0.1"].includes(location.hostname)
-    ? "http://localhost:8787"
-    : "https://ahmed-portfolio-chat.ahmedeldegla.workers.dev";
+  const API = window.AE_API;
   const EMAIL = "ahmeddagla99@gmail.com";
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
   const tzLabel = tz.replace(/_/g, " ");
